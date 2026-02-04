@@ -1,6 +1,9 @@
 using FluentAssertions;
+using Microsoft.AspNetCore.TestHost;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
+using NovaSaaS.Application.Interfaces.AI;
+using System.Collections.Generic;
 using System.Net;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
@@ -27,7 +30,13 @@ namespace NovaSaaS.IntegrationTests
         public async Task HealthCheck_ShouldReturnHealthy()
         {
             // Arrange
-            var client = _factory.CreateClient();
+            var client = _factory.WithWebHostBuilder(builder =>
+            {
+                builder.ConfigureTestServices(services =>
+                {
+                    services.AddScoped<IEmbeddingService, FakeEmbeddingService>();
+                });
+            }).CreateClient();
 
             // Act
             var response = await client.GetAsync("/health");
@@ -36,6 +45,24 @@ namespace NovaSaaS.IntegrationTests
             response.EnsureSuccessStatusCode();
             var content = await response.Content.ReadAsStringAsync();
             content.Should().Contain("\"status\": \"Healthy\"");
+        }
+
+        public class FakeEmbeddingService : IEmbeddingService
+        {
+            public Task<float[]> GenerateEmbeddingAsync(string text)
+            {
+                return Task.FromResult(new float[768]); // Return dummy 768-dim vector
+            }
+
+            public Task<List<float[]>> GenerateEmbeddingsAsync(List<string> texts)
+            {
+                var result = new List<float[]>();
+                foreach (var text in texts)
+                {
+                    result.Add(new float[768]);
+                }
+                return Task.FromResult(result);
+            }
         }
 
         #endregion
