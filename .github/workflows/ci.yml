@@ -26,4 +26,6 @@ jobs:
       run: dotnet build --no-restore --configuration Release
 
     - name: Test
-      run: dotnet test --no-build --verbosity normal
+      run: |
+        dotnet test NovaSaaS.UnitTests/NovaSaaS.UnitTests.csproj --no-build --configuration Release --verbosity normal
+        dotnet test NovaSaaS.IntegrationTests/NovaSaaS.IntegrationTests.csproj --no-build --configuration Release --verbosity normal
