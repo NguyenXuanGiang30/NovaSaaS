@@ -1,0 +1,6 @@
+@NovaSaaSWebAPI_HostAddress = http://localhost:5053
+
+GET {{NovaSaaSWebAPI_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

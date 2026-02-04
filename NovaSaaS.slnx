@@ -1,0 +1,8 @@
+<Solution>
+  <Project Path="NovaSaaS.Application/NovaSaaS.Application.csproj" />
+  <Project Path="NovaSaaS.Domain/NovaSaaS.Domain.csproj" />
+  <Project Path="NovaSaaS.Infrastructure/NovaSaaS.Infrastructure.csproj" />
+  <Project Path="NovaSaaS.IntegrationTests/NovaSaaS.IntegrationTests.csproj" Id="9fe206a1-2542-42ed-8205-b43a52479269" />
+  <Project Path="NovaSaaS.UnitTests/NovaSaaS.UnitTests.csproj" Id="04459c78-a004-4bd2-81bc-d7ff6ebd8e01" />
+  <Project Path="NovaSaaSWebAPI/NovaSaaS.WebApi.csproj" />
+</Solution>

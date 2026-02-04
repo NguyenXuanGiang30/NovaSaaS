@@ -1,0 +1,221 @@
+{
+  "annotations": {
+    "list": []
+  },
+  "description": "NovaSaaS SaaS Platform Monitoring Dashboard",
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": null,
+  "links": [],
+  "liveNow": false,
+  "panels": [
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 80 },
+              { "color": "red", "value": 95 }
+            ]
+          },
+          "unit": "percent"
+        }
+      },
+      "gridPos": { "h": 6, "w": 6, "x": 0, "y": 0 },
+      "id": 1,
+      "options": {
+        "orientation": "auto",
+        "reduceOptions": { "calcs": ["lastNotNull"] },
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true
+      },
+      "title": "AI Chat Success Rate",
+      "type": "gauge",
+      "targets": [
+        {
+          "expr": "rate(novasaas_ai_chat_requests_total{status=\"success\"}[5m]) / rate(novasaas_ai_chat_requests_total[5m]) * 100",
+          "legendFormat": "Success Rate"
+        }
+      ]
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "unit": "ms"
+        }
+      },
+      "gridPos": { "h": 6, "w": 6, "x": 6, "y": 0 },
+      "id": 2,
+      "options": {
+        "orientation": "auto",
+        "reduceOptions": { "calcs": ["mean"] }
+      },
+      "title": "PostgreSQL Avg Response Time",
+      "type": "stat",
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.95, rate(db_query_duration_seconds_bucket[5m])) * 1000",
+          "legendFormat": "p95"
+        }
+      ]
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "unit": "bytes"
+        }
+      },
+      "gridPos": { "h": 6, "w": 6, "x": 12, "y": 0 },
+      "id": 3,
+      "title": "Redis Memory Usage",
+      "type": "stat",
+      "targets": [
+        {
+          "expr": "redis_memory_used_bytes",
+          "legendFormat": "Memory Used"
+        }
+      ]
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": { "unit": "short" }
+      },
+      "gridPos": { "h": 6, "w": 6, "x": 18, "y": 0 },
+      "id": 4,
+      "title": "Active Tenants",
+      "type": "stat",
+      "targets": [
+        {
+          "expr": "count(novasaas_tenant_active)",
+          "legendFormat": "Tenants"
+        }
+      ]
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 6 },
+      "id": 5,
+      "title": "Request Rate by Tenant",
+      "type": "timeseries",
+      "targets": [
+        {
+          "expr": "sum(rate(http_server_request_duration_seconds_count[5m])) by (tenant_id)",
+          "legendFormat": "{{tenant_id}}"
+        }
+      ]
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 6 },
+      "id": 6,
+      "title": "AI Token Usage",
+      "type": "timeseries",
+      "targets": [
+        {
+          "expr": "sum(rate(novasaas_ai_tokens_used_total[1h])) by (tenant_id)",
+          "legendFormat": "{{tenant_id}}"
+        }
+      ]
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "gridPos": { "h": 6, "w": 24, "x": 0, "y": 14 },
+      "id": 7,
+      "title": "HTTP Response Codes",
+      "type": "timeseries",
+      "targets": [
+        {
+          "expr": "sum(rate(http_server_request_duration_seconds_count[5m])) by (http_response_status_code)",
+          "legendFormat": "{{http_response_status_code}}"
+        }
+      ]
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "gridPos": { "h": 6, "w": 12, "x": 0, "y": 20 },
+      "id": 8,
+      "title": "Rate Limit Rejections",
+      "type": "timeseries",
+      "targets": [
+        {
+          "expr": "sum(rate(novasaas_rate_limit_rejected_total[5m])) by (tenant_id)",
+          "legendFormat": "{{tenant_id}}"
+        }
+      ]
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "gridPos": { "h": 6, "w": 12, "x": 12, "y": 20 },
+      "id": 9,
+      "title": "Document Processing Queue",
+      "type": "stat",
+      "targets": [
+        {
+          "expr": "novasaas_document_processing_queue_length",
+          "legendFormat": "Queue Length"
+        }
+      ]
+    }
+  ],
+  "refresh": "30s",
+  "schemaVersion": 38,
+  "style": "dark",
+  "tags": ["novasaas", "saas", "monitoring"],
+  "templating": {
+    "list": [
+      {
+        "name": "tenant_id",
+        "type": "query",
+        "datasource": { "type": "prometheus", "uid": "prometheus" },
+        "query": "label_values(novasaas_tenant_active, tenant_id)"
+      }
+    ]
+  },
+  "time": { "from": "now-1h", "to": "now" },
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "NovaSaaS - Production Dashboard",
+  "uid": "novasaas-main",
+  "version": 1,
+  "weekStart": ""
+}
