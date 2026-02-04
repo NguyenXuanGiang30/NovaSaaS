@@ -156,7 +156,7 @@ namespace NovaSaaS.Infrastructure.Caching
                 await SetAsync(key, value, expiry);
             }
 
-            return value;
+            return value!;
         }
 
         /// <summary>
