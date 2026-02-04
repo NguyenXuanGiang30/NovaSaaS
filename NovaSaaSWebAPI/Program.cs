@@ -201,7 +201,7 @@ builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
 // ========================================
 builder.Services.AddSignalR()
     .AddStackExchangeRedis(redisConnectionString, options => {
-        options.Configuration.ChannelPrefix = "NovaSaaS_SignalR";
+        options.Configuration.ChannelPrefix = RedisChannel.Literal("NovaSaaS_SignalR");
     });
 
 

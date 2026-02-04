@@ -3,7 +3,6 @@ using NovaSaaS.Domain.Entities.Business;
 using NovaSaaS.Domain.Entities.Inventory;
 using NovaSaaS.Domain.Enums;
 using NovaSaaS.Domain.Interfaces;
-using NovaSaaS.Domain.Interfaces;
 using NovaSaaS.Application.Services.Inventory;
 using NovaSaaS.Application.Interfaces.Inventory; // IStockService
 using NovaSaaS.Application.Interfaces.Business; // ICustomerService

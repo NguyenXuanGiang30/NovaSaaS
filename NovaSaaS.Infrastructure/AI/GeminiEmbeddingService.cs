@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
+#pragma warning disable CS0618 // Type or member is obsolete
 namespace NovaSaaS.Infrastructure.AI
 {
     /// <summary>

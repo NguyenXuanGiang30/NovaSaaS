@@ -358,7 +358,7 @@ namespace NovaSaaS.UnitTests.Services
         {
             // Arrange
             var contexts = new List<string>();
-            var question = "What is the capital of France?";
+
 
             // Act
             var hasContext = contexts.Any();
