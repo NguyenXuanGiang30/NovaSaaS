@@ -35,7 +35,7 @@ namespace NovaSaaS.IntegrationTests
             // Assert
             response.EnsureSuccessStatusCode();
             var content = await response.Content.ReadAsStringAsync();
-            content.Should().Be("Healthy");
+            content.Should().Contain("\"status\": \"Healthy\"");
         }
 
         #endregion
