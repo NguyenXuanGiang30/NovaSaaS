@@ -144,7 +144,7 @@ namespace NovaSaaS.Infrastructure.Caching
             if (cached != null)
             {
                 _logger.LogDebug("Cache HIT: {Key}", key);
-                return cached;
+                return cached!;
             }
 
             // Cache miss - load từ factory

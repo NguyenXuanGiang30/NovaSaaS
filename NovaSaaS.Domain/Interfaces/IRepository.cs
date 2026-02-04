@@ -24,7 +24,7 @@ namespace NovaSaaS.Domain.Interfaces
         /// <summary>
         /// Lấy entity theo ID với các bảng liên quan (Include).
         /// </summary>
-        Task<T?> GetByIdAsync(Guid id, params Expression<Func<T, object>>[] includes);
+        Task<T?> GetByIdAsync(Guid id, params Expression<Func<T, object?>>[] includes);
 
         /// <summary>
         /// Lấy tất cả entities (không bao gồm đã xóa mềm).
@@ -34,7 +34,7 @@ namespace NovaSaaS.Domain.Interfaces
         /// <summary>
         /// Lấy tất cả entities với Include.
         /// </summary>
-        Task<IEnumerable<T>> GetAllAsync(params Expression<Func<T, object>>[] includes);
+        Task<IEnumerable<T>> GetAllAsync(params Expression<Func<T, object?>>[] includes);
 
         /// <summary>
         /// Lấy entities theo điều kiện.
@@ -44,7 +44,7 @@ namespace NovaSaaS.Domain.Interfaces
         /// <summary>
         /// Lấy entities theo điều kiện với Include.
         /// </summary>
-        Task<IEnumerable<T>> FindAsync(Expression<Func<T, bool>> predicate, params Expression<Func<T, object>>[] includes);
+        Task<IEnumerable<T>> FindAsync(Expression<Func<T, bool>> predicate, params Expression<Func<T, object?>>[] includes);
 
         /// <summary>
         /// Lấy entity đầu tiên theo điều kiện.

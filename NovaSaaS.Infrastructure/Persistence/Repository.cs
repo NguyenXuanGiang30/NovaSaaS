@@ -39,7 +39,7 @@ namespace NovaSaaS.Infrastructure.Persistence
             return entity;
         }
 
-        public virtual async Task<T?> GetByIdAsync(Guid id, params Expression<Func<T, object>>[] includes)
+        public virtual async Task<T?> GetByIdAsync(Guid id, params Expression<Func<T, object?>>[] includes)
         {
             IQueryable<T> query = _dbSet;
 
@@ -57,7 +57,7 @@ namespace NovaSaaS.Infrastructure.Persistence
             return await _dbSet.Where(e => !e.IsDeleted).ToListAsync();
         }
 
-        public virtual async Task<IEnumerable<T>> GetAllAsync(params Expression<Func<T, object>>[] includes)
+        public virtual async Task<IEnumerable<T>> GetAllAsync(params Expression<Func<T, object?>>[] includes)
         {
             IQueryable<T> query = _dbSet.Where(e => !e.IsDeleted);
 
@@ -76,7 +76,7 @@ namespace NovaSaaS.Infrastructure.Persistence
 
         public virtual async Task<IEnumerable<T>> FindAsync(
             Expression<Func<T, bool>> predicate, 
-            params Expression<Func<T, object>>[] includes)
+            params Expression<Func<T, object?>>[] includes)
         {
             IQueryable<T> query = _dbSet.Where(e => !e.IsDeleted).Where(predicate);
 

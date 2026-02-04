@@ -104,7 +104,7 @@ namespace NovaSaaSWebAPI.Controllers
             var schemaName = _tenantService.SchemaName;
 
             _backgroundJobClient.Enqueue<DocumentProcessingJob>(job => 
-                job.ProcessDocumentAsync(tenantId, document.Id, schemaName));
+                job.ProcessDocumentAsync(tenantId, document.Id, schemaName ?? "public"));
 
             return Ok(new
             {
