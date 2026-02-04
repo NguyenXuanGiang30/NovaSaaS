@@ -44,7 +44,7 @@ namespace NovaSaaS.Application.Services
         /// <summary>
         /// Lấy entity theo ID với Include.
         /// </summary>
-        public virtual async Task<TEntity?> GetByIdAsync(Guid id, params Expression<Func<TEntity, object>>[] includes)
+        public virtual async Task<TEntity?> GetByIdAsync(Guid id, params Expression<Func<TEntity, object?>>[] includes)
         {
             return await _repository.GetByIdAsync(id, includes);
         }
@@ -60,7 +60,7 @@ namespace NovaSaaS.Application.Services
         /// <summary>
         /// Lấy tất cả entities với Include.
         /// </summary>
-        public virtual async Task<IEnumerable<TEntity>> GetAllAsync(params Expression<Func<TEntity, object>>[] includes)
+        public virtual async Task<IEnumerable<TEntity>> GetAllAsync(params Expression<Func<TEntity, object?>>[] includes)
         {
             return await _repository.GetAllAsync(includes);
         }

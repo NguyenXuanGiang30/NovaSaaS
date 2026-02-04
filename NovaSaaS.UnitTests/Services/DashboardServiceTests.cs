@@ -304,7 +304,7 @@ namespace NovaSaaS.UnitTests.Services
 
             _mockUnitOfWork.Setup(u => u.OrderItems.FindAsync(
                 It.IsAny<Expression<Func<OrderItem, bool>>>(),
-                It.IsAny<Expression<Func<OrderItem, object>>[]>()))
+                It.IsAny<Expression<Func<OrderItem, object?>>[]>()))
                 .ReturnsAsync(orderItems);
 
             // Act
@@ -373,8 +373,8 @@ namespace NovaSaaS.UnitTests.Services
         {
             _mockUnitOfWork.Setup(u => u.Orders.FindAsync(
                 It.IsAny<Expression<Func<Order, bool>>>(),
-                It.IsAny<Expression<Func<Order, object>>[]>()))
-                .ReturnsAsync((Expression<Func<Order, bool>> predicate, Expression<Func<Order, object>>[] includes) => 
+                It.IsAny<Expression<Func<Order, object?>>[]>()))
+                .ReturnsAsync((Expression<Func<Order, bool>> predicate, Expression<Func<Order, object?>>[] includes) => 
                 {
                     return orders.AsQueryable().Where(predicate).ToList();
                 });
@@ -384,8 +384,8 @@ namespace NovaSaaS.UnitTests.Services
         {
             _mockUnitOfWork.Setup(u => u.Products.FindAsync(
                 It.IsAny<Expression<Func<Product, bool>>>(),
-                It.IsAny<Expression<Func<Product, object>>[]>()))
-                .ReturnsAsync((Expression<Func<Product, bool>> predicate, Expression<Func<Product, object>>[] includes) => 
+                It.IsAny<Expression<Func<Product, object?>>[]>()))
+                .ReturnsAsync((Expression<Func<Product, bool>> predicate, Expression<Func<Product, object?>>[] includes) => 
                 {
                     return products.AsQueryable().Where(predicate).ToList();
                 });
@@ -401,8 +401,8 @@ namespace NovaSaaS.UnitTests.Services
         {
             _mockUnitOfWork.Setup(u => u.Products.FindAsync(
                 It.IsAny<Expression<Func<Product, bool>>>(),
-                It.IsAny<Expression<Func<Product, object>>[]>()))
-                .ReturnsAsync((Expression<Func<Product, bool>> predicate, Expression<Func<Product, object>>[] includes) => 
+                It.IsAny<Expression<Func<Product, object?>>[]>()))
+                .ReturnsAsync((Expression<Func<Product, bool>> predicate, Expression<Func<Product, object?>>[] includes) => 
                 {
                     return products.AsQueryable().Where(predicate).ToList();
                 });
@@ -412,8 +412,8 @@ namespace NovaSaaS.UnitTests.Services
         {
             _mockUnitOfWork.Setup(u => u.Customers.FindAsync(
                 It.IsAny<Expression<Func<Customer, bool>>>(),
-                It.IsAny<Expression<Func<Customer, object>>[]>()))
-                .ReturnsAsync((Expression<Func<Customer, bool>> predicate, Expression<Func<Customer, object>>[] includes) => 
+                It.IsAny<Expression<Func<Customer, object?>>[]>()))
+                .ReturnsAsync((Expression<Func<Customer, bool>> predicate, Expression<Func<Customer, object?>>[] includes) => 
                 {
                     return customers.AsQueryable().Where(predicate).ToList();
                 });
@@ -435,8 +435,8 @@ namespace NovaSaaS.UnitTests.Services
         {
             _mockUnitOfWork.Setup(u => u.Invoices.FindAsync(
                 It.IsAny<Expression<Func<Invoice, bool>>>(),
-                It.IsAny<Expression<Func<Invoice, object>>[]>()))
-                .ReturnsAsync((Expression<Func<Invoice, bool>> predicate, Expression<Func<Invoice, object>>[] includes) => 
+                It.IsAny<Expression<Func<Invoice, object?>>[]>()))
+                .ReturnsAsync((Expression<Func<Invoice, bool>> predicate, Expression<Func<Invoice, object?>>[] includes) => 
                 {
                     return invoices.AsQueryable().Where(predicate).ToList();
                 });

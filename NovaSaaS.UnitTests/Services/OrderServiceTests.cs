@@ -91,9 +91,9 @@ namespace NovaSaaS.UnitTests.Services
 
             _mockOrderRepo.Setup(r => r.FindAsync(
                 It.IsAny<Expression<Func<Order, bool>>>(),
-                It.IsAny<Expression<Func<Order, object>>>(),
-                It.IsAny<Expression<Func<Order, object>>>(),
-                It.IsAny<Expression<Func<Order, object>>>()
+                It.IsAny<Expression<Func<Order, object?>>>(),
+                It.IsAny<Expression<Func<Order, object?>>>(),
+                It.IsAny<Expression<Func<Order, object?>>>()
             )).ReturnsAsync(() => new List<Order> { 
                 new Order { 
                     Id = Guid.NewGuid(), 
@@ -145,9 +145,9 @@ namespace NovaSaaS.UnitTests.Services
 
             _mockOrderRepo.Setup(r => r.FindAsync(
                 It.IsAny<Expression<Func<Order, bool>>>(),
-                It.IsAny<Expression<Func<Order, object>>>(),
-                It.IsAny<Expression<Func<Order, object>>>(),
-                It.IsAny<Expression<Func<Order, object>>>()
+                It.IsAny<Expression<Func<Order, object?>>>(),
+                It.IsAny<Expression<Func<Order, object?>>>(),
+                It.IsAny<Expression<Func<Order, object?>>>()
             )).ReturnsAsync(() => new List<Order> { 
                 new Order { 
                     Id = Guid.NewGuid(), 
@@ -256,9 +256,9 @@ namespace NovaSaaS.UnitTests.Services
             
             _mockOrderRepo.Setup(r => r.FindAsync(
                 It.IsAny<Expression<Func<Order, bool>>>(),
-                It.IsAny<Expression<Func<Order, object>>>(),
-                It.IsAny<Expression<Func<Order, object>>>(),
-                It.IsAny<Expression<Func<Order, object>>>()
+                It.IsAny<Expression<Func<Order, object?>>>(),
+                It.IsAny<Expression<Func<Order, object?>>>(),
+                It.IsAny<Expression<Func<Order, object?>>>()
             )).ReturnsAsync(new List<Order> { 
                 new Order { 
                     Id = Guid.NewGuid(), 
