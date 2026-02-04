@@ -1,6 +1,6 @@
 # 🚀 NovaSaaS - Enterprise Multi-tenant SaaS Platform
 
-![Build Status](https://img.shields.io/badge/Build-Passing-brightgreen)
+[![NovaSaaS CI](https://github.com/NguyenXuanGiang30/NovaSaaS/actions/workflows/ci.yml/badge.svg)](https://github.com/NguyenXuanGiang30/NovaSaaS/actions/workflows/ci.yml)
 ![.NET](https://img.shields.io/badge/.NET-10.0-512BD4)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-336791)
 ![AI](https://img.shields.io/badge/AI-Gemini_Flash-8E75B2)
