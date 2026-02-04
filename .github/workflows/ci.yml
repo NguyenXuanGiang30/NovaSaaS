@@ -11,6 +11,31 @@ jobs:
 
     runs-on: ubuntu-latest
 
+    services:
+      postgres:
+        image: postgres:latest
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: password
+          POSTGRES_DB: novasaas_db
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+      redis:
+        image: redis:latest
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
     steps:
     - uses: actions/checkout@v4
 
@@ -26,6 +51,9 @@ jobs:
       run: dotnet build --no-restore --configuration Release
 
     - name: Test
+      env:
+        ConnectionStrings__DefaultConnection: "Host=localhost;Port=5432;Database=novasaas_db;Username=postgres;Password=password"
+        ConnectionStrings__Redis: "localhost:6379"
       run: |
         dotnet test NovaSaaS.UnitTests/NovaSaaS.UnitTests.csproj --no-build --configuration Release --verbosity normal
         dotnet test NovaSaaS.IntegrationTests/NovaSaaS.IntegrationTests.csproj --no-build --configuration Release --verbosity normal
