@@ -117,5 +117,6 @@ namespace NovaSaaS.Domain.Entities.SCM
         public virtual ICollection<VendorContact> Contacts { get; set; } = new List<VendorContact>();
         public virtual ICollection<PurchaseOrder> PurchaseOrders { get; set; } = new List<PurchaseOrder>();
         public virtual ICollection<PurchaseInvoice> PurchaseInvoices { get; set; } = new List<PurchaseInvoice>();
+        public virtual ICollection<VendorPriceList> PriceLists { get; set; } = new List<VendorPriceList>();
     }
 }

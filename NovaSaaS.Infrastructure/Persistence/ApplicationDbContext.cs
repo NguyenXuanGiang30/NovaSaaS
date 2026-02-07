@@ -159,6 +159,8 @@ namespace NovaSaaS.Infrastructure.Persistence
         public DbSet<VendorPayment> VendorPayments => Set<VendorPayment>();
         public DbSet<ReturnToVendor> ReturnToVendors => Set<ReturnToVendor>();
         public DbSet<ReturnToVendorItem> ReturnToVendorItems => Set<ReturnToVendorItem>();
+        public DbSet<VendorPriceList> VendorPriceLists => Set<VendorPriceList>();
+        public DbSet<VendorPriceListItem> VendorPriceListItems => Set<VendorPriceListItem>();
 
         // =============================================
         // PM (Quản lý Dự án)
@@ -568,6 +570,16 @@ namespace NovaSaaS.Infrastructure.Persistence
                 .WithMany(rtv => rtv.Items)
                 .HasForeignKey(rtvi => rtvi.ReturnToVendorId);
 
+            modelBuilder.Entity<VendorPriceList>()
+                .HasOne(vpl => vpl.Vendor)
+                .WithMany(v => v.PriceLists)
+                .HasForeignKey(vpl => vpl.VendorId);
+
+            modelBuilder.Entity<VendorPriceListItem>()
+                .HasOne(vpli => vpli.VendorPriceList)
+                .WithMany(vpl => vpl.Items)
+                .HasForeignKey(vpli => vpli.VendorPriceListId);
+
             // =============================================
             // 8. PM Relationships
             // =============================================
@@ -826,6 +838,7 @@ namespace NovaSaaS.Infrastructure.Persistence
                 (typeof(ReturnToVendor), nameof(ReturnToVendor.TotalAmount)),
                 (typeof(ReturnToVendor), nameof(ReturnToVendor.RefundAmount)),
                 (typeof(ReturnToVendorItem), nameof(ReturnToVendorItem.UnitPrice)),
+                (typeof(VendorPriceListItem), nameof(VendorPriceListItem.UnitPrice)),
                 // PM
                 (typeof(Project), nameof(Project.Budget)),
                 (typeof(Project), nameof(Project.ActualCost)),
