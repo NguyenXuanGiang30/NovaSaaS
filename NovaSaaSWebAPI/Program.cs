@@ -135,11 +135,26 @@ builder.Services.AddScoped<NovaSaaS.Application.Services.Inventory.UnitService>(
 builder.Services.AddScoped<NovaSaaS.Application.Services.Inventory.ProductService>();
 builder.Services.AddScoped<NovaSaaS.Application.Services.Inventory.WarehouseService>();
 builder.Services.AddScoped<IStockService, NovaSaaS.Application.Services.Inventory.StockService>();
+builder.Services.AddScoped<NovaSaaS.Application.Services.Inventory.ProductVariantService>();
+builder.Services.AddScoped<NovaSaaS.Application.Services.Inventory.LocationService>();
+builder.Services.AddScoped<NovaSaaS.Application.Services.Inventory.StockAdjustmentService>();
+builder.Services.AddScoped<NovaSaaS.Application.Services.Inventory.StockTransferService>();
+builder.Services.AddScoped<NovaSaaS.Application.Services.Inventory.InventoryCountService>();
+builder.Services.AddScoped<NovaSaaS.Application.Services.Inventory.LotNumberService>();
+builder.Services.AddScoped<NovaSaaS.Application.Services.Inventory.SerialNumberService>();
 
 // Business Services (Sales & CRM)
 builder.Services.AddScoped<ICustomerService, NovaSaaS.Application.Services.Business.CustomerService>();
 builder.Services.AddScoped<NovaSaaS.Application.Services.Business.OrderService>();
 builder.Services.AddScoped<NovaSaaS.Application.Services.Business.InvoiceService>();
+builder.Services.AddScoped<NovaSaaS.Application.Services.Business.CustomerGroupService>();
+builder.Services.AddScoped<NovaSaaS.Application.Services.Business.ContactService>();
+builder.Services.AddScoped<NovaSaaS.Application.Services.Business.LeadService>();
+builder.Services.AddScoped<NovaSaaS.Application.Services.Business.OpportunityService>();
+builder.Services.AddScoped<NovaSaaS.Application.Services.Business.QuotationService>();
+builder.Services.AddScoped<NovaSaaS.Application.Services.Business.LoyaltyService>();
+builder.Services.AddScoped<NovaSaaS.Application.Services.Business.CampaignService>();
+builder.Services.AddScoped<NovaSaaS.Application.Services.Business.ActivityService>();
 
 // Master Admin Services
 builder.Services.AddScoped<NovaSaaS.Application.Services.Master.SubscriptionService>();

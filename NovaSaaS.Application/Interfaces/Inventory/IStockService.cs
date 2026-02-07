@@ -15,8 +15,8 @@ namespace NovaSaaS.Application.Interfaces.Inventory
             DateTime? fromDate = null,
             DateTime? toDate = null,
             int take = 50);
-        Task<StockMovementDto> AdjustStockAsync(StockAdjustmentDto dto);
-        Task<(StockMovementDto outMovement, StockMovementDto inMovement)> TransferStockAsync(StockTransferDto dto);
+        Task<StockMovementDto> AdjustStockAsync(QuickStockAdjustmentDto dto);
+        Task<(StockMovementDto outMovement, StockMovementDto inMovement)> TransferStockAsync(QuickStockTransferDto dto);
         Task ReduceStockForOrderAsync(Guid orderId, string orderNumber, List<NovaSaaS.Application.DTOs.Business.CreateOrderItemDto> items);
     }
 }

@@ -1,4 +1,4 @@
-﻿using NovaSaaS.Domain.Entities.Common;
+using NovaSaaS.Domain.Entities.Common;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -80,5 +80,8 @@ namespace NovaSaaS.Domain.Entities.Inventory
         // Navigation
         public virtual ICollection<Stock> Stocks { get; set; } = new List<Stock>();
         public virtual ICollection<StockMovement> StockMovements { get; set; } = new List<StockMovement>();
+        public virtual ICollection<ProductVariant> Variants { get; set; } = new List<ProductVariant>();
+        public virtual ICollection<LotNumber> LotNumbers { get; set; } = new List<LotNumber>();
+        public virtual ICollection<SerialNumber> SerialNumbers { get; set; } = new List<SerialNumber>();
     }
 }

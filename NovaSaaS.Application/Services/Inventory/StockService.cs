@@ -122,7 +122,7 @@ namespace NovaSaaS.Application.Services.Inventory
         /// <summary>
         /// Nhập hoặc Xuất kho.
         /// </summary>
-        public async Task<StockMovementDto> AdjustStockAsync(StockAdjustmentDto dto)
+        public async Task<StockMovementDto> AdjustStockAsync(QuickStockAdjustmentDto dto)
         {
             // Validate product
             var product = await _unitOfWork.Products.GetByIdAsync(dto.ProductId);
@@ -229,7 +229,7 @@ namespace NovaSaaS.Application.Services.Inventory
         /// Chuyển kho - Sử dụng Transaction đảm bảo atomic.
         /// </summary>
         public async Task<(StockMovementDto outMovement, StockMovementDto inMovement)> TransferStockAsync(
-            StockTransferDto dto)
+            QuickStockTransferDto dto)
         {
             if (dto.FromWarehouseId == dto.ToWarehouseId)
                 throw new ArgumentException("Kho nguồn và kho đích không được trùng nhau");

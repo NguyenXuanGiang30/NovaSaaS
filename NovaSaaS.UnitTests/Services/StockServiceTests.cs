@@ -54,7 +54,7 @@ namespace NovaSaaS.UnitTests.Services
             // Arrange
             var productId = Guid.NewGuid();
             var warehouseId = Guid.NewGuid();
-            var dto = new StockAdjustmentDto
+            var dto = new QuickStockAdjustmentDto
             {
                 ProductId = productId,
                 WarehouseId = warehouseId,
@@ -83,7 +83,7 @@ namespace NovaSaaS.UnitTests.Services
         public async Task AdjustStockAsync_Outbound_NoExistingStock_ShouldThrow()
         {
             // Arrange
-            var dto = new StockAdjustmentDto
+            var dto = new QuickStockAdjustmentDto
             {
                 ProductId = Guid.NewGuid(),
                 WarehouseId = Guid.NewGuid(),
@@ -117,7 +117,7 @@ namespace NovaSaaS.UnitTests.Services
             // Arrange
             var productId = Guid.NewGuid();
             var warehouseId = Guid.NewGuid();
-            var dto = new StockAdjustmentDto
+            var dto = new QuickStockAdjustmentDto
             {
                 ProductId = productId,
                 WarehouseId = warehouseId,
@@ -152,7 +152,7 @@ namespace NovaSaaS.UnitTests.Services
             // Arrange
             var productId = Guid.NewGuid();
             var warehouseId = Guid.NewGuid();
-            var dto = new StockAdjustmentDto
+            var dto = new QuickStockAdjustmentDto
             {
                 ProductId = productId,
                 WarehouseId = warehouseId,
@@ -190,7 +190,7 @@ namespace NovaSaaS.UnitTests.Services
         {
             // Arrange
             var warehouseId = Guid.NewGuid();
-            var dto = new StockTransferDto
+            var dto = new QuickStockTransferDto
             {
                 ProductId = Guid.NewGuid(),
                 FromWarehouseId = warehouseId,
@@ -214,7 +214,7 @@ namespace NovaSaaS.UnitTests.Services
             var fromWarehouseId = Guid.NewGuid();
             var toWarehouseId = Guid.NewGuid();
             
-            var dto = new StockTransferDto
+            var dto = new QuickStockTransferDto
             {
                 ProductId = productId,
                 FromWarehouseId = fromWarehouseId,

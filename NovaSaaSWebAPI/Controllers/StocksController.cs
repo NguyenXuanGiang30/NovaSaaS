@@ -46,7 +46,7 @@ namespace NovaSaaS.WebAPI.Controllers
         /// Nhập/Xuất kho.
         /// </summary>
         [HttpPost("adjust")]
-        public async Task<IActionResult> AdjustStock([FromBody] StockAdjustmentDto dto)
+        public async Task<IActionResult> AdjustStock([FromBody] QuickStockAdjustmentDto dto)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -71,7 +71,7 @@ namespace NovaSaaS.WebAPI.Controllers
         /// Sử dụng Transaction đảm bảo atomic.
         /// </summary>
         [HttpPost("transfer")]
-        public async Task<IActionResult> TransferStock([FromBody] StockTransferDto dto)
+        public async Task<IActionResult> TransferStock([FromBody] QuickStockTransferDto dto)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);

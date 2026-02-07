@@ -37,7 +37,7 @@ namespace NovaSaaS.Infrastructure.Persistence
             _currentUserService = currentUserService;
         }
 
-        // --- Đăng ký các DbSet (27 thực thể) ---
+        // --- Đăng ký các DbSet ---
         // Master
         public DbSet<Tenant> Tenants => Set<Tenant>();
         public DbSet<SubscriptionPlan> SubscriptionPlans => Set<SubscriptionPlan>();
@@ -55,19 +55,40 @@ namespace NovaSaaS.Infrastructure.Persistence
         public DbSet<UserRole> UserRoles => Set<UserRole>();
         public DbSet<RolePermission> RolePermissions => Set<RolePermission>();
 
-        // Business & Inventory
-        public DbSet<Product> Products => Set<Product>();
-        public DbSet<Category> Categories => Set<Category>();
+        // Business (CRM)
+        public DbSet<Customer> Customers => Set<Customer>();
+        public DbSet<CustomerGroup> CustomerGroups => Set<CustomerGroup>();
+        public DbSet<Contact> Contacts => Set<Contact>();
+        public DbSet<Lead> Leads => Set<Lead>();
+        public DbSet<Opportunity> Opportunities => Set<Opportunity>();
         public DbSet<Order> Orders => Set<Order>();
         public DbSet<OrderItem> OrderItems => Set<OrderItem>();
+        public DbSet<Quotation> Quotations => Set<Quotation>();
+        public DbSet<QuotationItem> QuotationItems => Set<QuotationItem>();
+        public DbSet<Invoice> Invoices => Set<Invoice>();
+        public DbSet<Coupon> Coupons => Set<Coupon>();
+        public DbSet<PaymentTransaction> PaymentTransactions => Set<PaymentTransaction>();
+        public DbSet<LoyaltyProgram> LoyaltyPrograms => Set<LoyaltyProgram>();
+        public DbSet<LoyaltyTransaction> LoyaltyTransactions => Set<LoyaltyTransaction>();
+        public DbSet<Campaign> Campaigns => Set<Campaign>();
+        public DbSet<Activity> Activities => Set<Activity>();
+
+        // Inventory
+        public DbSet<Product> Products => Set<Product>();
+        public DbSet<Category> Categories => Set<Category>();
         public DbSet<Warehouse> Warehouses => Set<Warehouse>();
         public DbSet<Unit> Units => Set<Unit>();
         public DbSet<Stock> Stocks => Set<Stock>();
         public DbSet<StockMovement> StockMovements => Set<StockMovement>();
-        public DbSet<Customer> Customers => Set<Customer>();
-        public DbSet<Coupon> Coupons => Set<Coupon>();
-        public DbSet<Invoice> Invoices => Set<Invoice>();
-        public DbSet<PaymentTransaction> PaymentTransactions => Set<PaymentTransaction>();
+        public DbSet<ProductVariant> ProductVariants => Set<ProductVariant>();
+        public DbSet<Location> Locations => Set<Location>();
+        public DbSet<StockAdjustment> StockAdjustments => Set<StockAdjustment>();
+        public DbSet<StockTransfer> StockTransfers => Set<StockTransfer>();
+        public DbSet<StockTransferItem> StockTransferItems => Set<StockTransferItem>();
+        public DbSet<InventoryCount> InventoryCounts => Set<InventoryCount>();
+        public DbSet<InventoryCountItem> InventoryCountItems => Set<InventoryCountItem>();
+        public DbSet<LotNumber> LotNumbers => Set<LotNumber>();
+        public DbSet<SerialNumber> SerialNumbers => Set<SerialNumber>();
 
         // AI & Logs
         public DbSet<KnowledgeDocument> KnowledgeDocuments => Set<KnowledgeDocument>();
@@ -115,6 +136,34 @@ namespace NovaSaaS.Infrastructure.Persistence
                 .WithMany(o => o.OrderItems)
                 .HasForeignKey(oi => oi.OrderId);
 
+            modelBuilder.Entity<QuotationItem>()
+                .HasOne(qi => qi.Quotation)
+                .WithMany(q => q.Items)
+                .HasForeignKey(qi => qi.QuotationId);
+
+            modelBuilder.Entity<StockTransferItem>()
+                .HasOne(si => si.StockTransfer)
+                .WithMany(s => s.Items)
+                .HasForeignKey(si => si.StockTransferId);
+
+            modelBuilder.Entity<InventoryCountItem>()
+                .HasOne(ci => ci.InventoryCount)
+                .WithMany(c => c.Items)
+                .HasForeignKey(ci => ci.InventoryCountId);
+
+            // StockTransfer - Warehouse relationships (avoid cascade cycles)
+            modelBuilder.Entity<StockTransfer>()
+                .HasOne(st => st.FromWarehouse)
+                .WithMany()
+                .HasForeignKey(st => st.FromWarehouseId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<StockTransfer>()
+                .HasOne(st => st.ToWarehouse)
+                .WithMany()
+                .HasForeignKey(st => st.ToWarehouseId)
+                .OnDelete(DeleteBehavior.Restrict);
+
             // 5. Cấu hình cho AI (Vector search)
             modelBuilder.Entity<DocumentSegment>(entity =>
             {
@@ -132,9 +181,33 @@ namespace NovaSaaS.Infrastructure.Persistence
             {
                 (typeof(SubscriptionPlan), nameof(SubscriptionPlan.MonthlyPrice)),
                 (typeof(Order), nameof(Order.TotalAmount)),
+                (typeof(Order), nameof(Order.SubTotal)),
+                (typeof(Order), nameof(Order.TaxAmount)),
+                (typeof(Order), nameof(Order.DiscountAmount)),
                 (typeof(OrderItem), nameof(OrderItem.UnitPrice)),
                 (typeof(Product), nameof(Product.Price)),
-                (typeof(Coupon), nameof(Coupon.DiscountValue))
+                (typeof(Product), nameof(Product.CostPrice)),
+                (typeof(Coupon), nameof(Coupon.DiscountValue)),
+                (typeof(Invoice), nameof(Invoice.TotalAmount)),
+                (typeof(PaymentTransaction), nameof(PaymentTransaction.Amount)),
+                // CRM
+                (typeof(Lead), nameof(Lead.EstimatedValue)),
+                (typeof(Opportunity), nameof(Opportunity.Value)),
+                (typeof(Quotation), nameof(Quotation.SubTotal)),
+                (typeof(Quotation), nameof(Quotation.TaxAmount)),
+                (typeof(Quotation), nameof(Quotation.DiscountAmount)),
+                (typeof(Quotation), nameof(Quotation.TotalAmount)),
+                (typeof(QuotationItem), nameof(QuotationItem.UnitPrice)),
+                (typeof(QuotationItem), nameof(QuotationItem.DiscountPercent)),
+                (typeof(CustomerGroup), nameof(CustomerGroup.DiscountPercent)),
+                (typeof(LoyaltyProgram), nameof(LoyaltyProgram.PointsPerAmount)),
+                (typeof(LoyaltyProgram), nameof(LoyaltyProgram.PointValue)),
+                (typeof(Campaign), nameof(Campaign.Budget)),
+                (typeof(Campaign), nameof(Campaign.ActualCost)),
+                (typeof(Campaign), nameof(Campaign.Revenue)),
+                // INV
+                (typeof(ProductVariant), nameof(ProductVariant.Price)),
+                (typeof(ProductVariant), nameof(ProductVariant.CostPrice))
             };
 
             foreach (var (type, prop) in decimalProps)

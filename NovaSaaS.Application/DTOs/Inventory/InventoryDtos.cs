@@ -282,9 +282,9 @@ namespace NovaSaaS.Application.DTOs.Inventory
     #region Stock Movement DTOs
 
     /// <summary>
-    /// DTO nhập/xuất kho.
+    /// DTO nhập/xuất kho nhanh (simple adjustment).
     /// </summary>
-    public class StockAdjustmentDto
+    public class QuickStockAdjustmentDto
     {
         [Required]
         public Guid ProductId { get; set; }
@@ -308,9 +308,9 @@ namespace NovaSaaS.Application.DTOs.Inventory
     }
 
     /// <summary>
-    /// DTO chuyển kho.
+    /// DTO chuyển kho nhanh (simple transfer).
     /// </summary>
-    public class StockTransferDto
+    public class QuickStockTransferDto
     {
         [Required]
         public Guid ProductId { get; set; }
