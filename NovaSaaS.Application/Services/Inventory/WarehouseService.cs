@@ -33,7 +33,7 @@ namespace NovaSaaS.Application.Services.Inventory
                 {
                     Id = w.Id,
                     Name = w.Name,
-                    Address = w.Adress,
+                    Address = w.Address,
                     TotalProducts = warehouseStocks.Select(s => s.ProductId).Distinct().Count(),
                     TotalQuantity = warehouseStocks.Sum(s => s.Quantity),
                     CreateAt = w.CreateAt
@@ -58,7 +58,7 @@ namespace NovaSaaS.Application.Services.Inventory
             {
                 Id = warehouse.Id,
                 Name = warehouse.Name,
-                Address = warehouse.Adress,
+                Address = warehouse.Address,
                 TotalProducts = stocks.Select(s => s.ProductId).Distinct().Count(),
                 TotalQuantity = stocks.Sum(s => s.Quantity),
                 CreateAt = warehouse.CreateAt
@@ -78,7 +78,7 @@ namespace NovaSaaS.Application.Services.Inventory
             var warehouse = new Warehouse
             {
                 Name = dto.Name,
-                Adress = dto.Address ?? ""
+                Address = dto.Address ?? ""
             };
 
             await CreateAsync(warehouse);
@@ -87,7 +87,7 @@ namespace NovaSaaS.Application.Services.Inventory
             {
                 Id = warehouse.Id,
                 Name = warehouse.Name,
-                Address = warehouse.Adress,
+                Address = warehouse.Address,
                 TotalProducts = 0,
                 TotalQuantity = 0,
                 CreateAt = warehouse.CreateAt
@@ -109,7 +109,7 @@ namespace NovaSaaS.Application.Services.Inventory
                 throw new InvalidOperationException($"Kho '{dto.Name}' đã tồn tại");
 
             warehouse.Name = dto.Name;
-            warehouse.Adress = dto.Address ?? "";
+            warehouse.Address = dto.Address ?? "";
 
             await UpdateAsync(warehouse);
 
