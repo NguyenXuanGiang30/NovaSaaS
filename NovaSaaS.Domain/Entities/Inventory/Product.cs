@@ -1,3 +1,4 @@
+using NovaSaaS.Domain.Entities.Accounting;
 using NovaSaaS.Domain.Entities.Common;
 using System;
 using System.Collections.Generic;
@@ -76,6 +77,24 @@ namespace NovaSaaS.Domain.Entities.Inventory
 
         public Guid UnitId { get; set; }
         public virtual Unit Unit { get; set; } = null!;
+
+        /// <summary>
+        /// TK hàng tồn kho (VD: 156) - liên kết ACC module.
+        /// </summary>
+        public Guid? InventoryAccountId { get; set; }
+        public virtual ChartOfAccount? InventoryAccount { get; set; }
+
+        /// <summary>
+        /// TK doanh thu bán hàng (VD: 511) - liên kết ACC module.
+        /// </summary>
+        public Guid? RevenueAccountId { get; set; }
+        public virtual ChartOfAccount? RevenueAccount { get; set; }
+
+        /// <summary>
+        /// TK giá vốn hàng bán (VD: 632) - liên kết ACC module.
+        /// </summary>
+        public Guid? CogsAccountId { get; set; }
+        public virtual ChartOfAccount? CogsAccount { get; set; }
 
         // Navigation
         public virtual ICollection<Stock> Stocks { get; set; } = new List<Stock>();

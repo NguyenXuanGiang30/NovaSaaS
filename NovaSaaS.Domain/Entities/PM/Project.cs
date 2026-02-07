@@ -1,3 +1,4 @@
+using NovaSaaS.Domain.Entities.Accounting;
 using NovaSaaS.Domain.Entities.Common;
 using NovaSaaS.Domain.Enums;
 using System;
@@ -88,6 +89,18 @@ namespace NovaSaaS.Domain.Entities.PM
         /// ID quản lý dự án.
         /// </summary>
         public Guid? ProjectManagerUserId { get; set; }
+
+        /// <summary>
+        /// TK doanh thu dự án (liên kết ACC module).
+        /// </summary>
+        public Guid? RevenueAccountId { get; set; }
+        public virtual ChartOfAccount? RevenueAccount { get; set; }
+
+        /// <summary>
+        /// TK chi phí dự án (liên kết ACC module).
+        /// </summary>
+        public Guid? ExpenseAccountId { get; set; }
+        public virtual ChartOfAccount? ExpenseAccount { get; set; }
 
         /// <summary>
         /// Ghi chú.

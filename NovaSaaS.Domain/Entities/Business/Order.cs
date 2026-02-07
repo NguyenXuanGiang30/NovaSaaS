@@ -1,4 +1,5 @@
 using NovaSaaS.Domain.Entities.Common;
+using NovaSaaS.Domain.Entities.PM;
 using NovaSaaS.Domain.Enums;
 using System;
 using System.Collections.Generic;
@@ -100,6 +101,12 @@ namespace NovaSaaS.Domain.Entities.Business
         /// ID nhân viên sales tạo đơn.
         /// </summary>
         public Guid? SalesUserId { get; set; }
+
+        /// <summary>
+        /// ID dự án liên quan (liên kết PM module).
+        /// </summary>
+        public Guid? ProjectId { get; set; }
+        public virtual Project? Project { get; set; }
 
         /// <summary>
         /// Ghi chú.

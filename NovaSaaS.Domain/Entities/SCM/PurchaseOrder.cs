@@ -1,4 +1,5 @@
 using NovaSaaS.Domain.Entities.Common;
+using NovaSaaS.Domain.Entities.PM;
 using NovaSaaS.Domain.Enums;
 using System;
 using System.Collections.Generic;
@@ -105,6 +106,12 @@ namespace NovaSaaS.Domain.Entities.SCM
         /// </summary>
         [MaxLength(10)]
         public string Currency { get; set; } = "VND";
+
+        /// <summary>
+        /// ID dự án liên quan (liên kết PM module).
+        /// </summary>
+        public Guid? ProjectId { get; set; }
+        public virtual Project? Project { get; set; }
 
         /// <summary>
         /// Ghi chú.

@@ -289,8 +289,44 @@ namespace NovaSaaS.Infrastructure.Persistence
                 .OnDelete(DeleteBehavior.Restrict);
 
             // =============================================
+            // 3b. CRM → PM cross-module
+            // =============================================
+            // Order -> Project (CRM → PM)
+            modelBuilder.Entity<Order>()
+                .HasOne(o => o.Project)
+                .WithMany()
+                .HasForeignKey(o => o.ProjectId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // Invoice -> Project (CRM → PM)
+            modelBuilder.Entity<Invoice>()
+                .HasOne(i => i.Project)
+                .WithMany()
+                .HasForeignKey(i => i.ProjectId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // =============================================
             // 4. INV Relationships
             // =============================================
+            // Product -> ChartOfAccount (INV → ACC cross-module)
+            modelBuilder.Entity<Product>()
+                .HasOne(p => p.InventoryAccount)
+                .WithMany()
+                .HasForeignKey(p => p.InventoryAccountId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Product>()
+                .HasOne(p => p.RevenueAccount)
+                .WithMany()
+                .HasForeignKey(p => p.RevenueAccountId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Product>()
+                .HasOne(p => p.CogsAccount)
+                .WithMany()
+                .HasForeignKey(p => p.CogsAccountId)
+                .OnDelete(DeleteBehavior.Restrict);
+
             modelBuilder.Entity<StockTransferItem>()
                 .HasOne(si => si.StockTransfer)
                 .WithMany(s => s.Items)
@@ -410,6 +446,13 @@ namespace NovaSaaS.Infrastructure.Persistence
                 .HasOne(p => p.SalaryExpenseAccount)
                 .WithMany()
                 .HasForeignKey(p => p.SalaryExpenseAccountId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // Payroll -> BankAccount (HRM → ACC cross-module)
+            modelBuilder.Entity<Payroll>()
+                .HasOne(p => p.BankAccount)
+                .WithMany()
+                .HasForeignKey(p => p.BankAccountId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<PayrollDetail>()
@@ -546,6 +589,13 @@ namespace NovaSaaS.Infrastructure.Persistence
                 .HasForeignKey(po => po.VendorId)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            // PurchaseOrder -> Project (SCM → PM cross-module)
+            modelBuilder.Entity<PurchaseOrder>()
+                .HasOne(po => po.Project)
+                .WithMany()
+                .HasForeignKey(po => po.ProjectId)
+                .OnDelete(DeleteBehavior.Restrict);
+
             modelBuilder.Entity<PurchaseOrderItem>()
                 .HasOne(poi => poi.PurchaseOrder)
                 .WithMany(po => po.Items)
@@ -618,6 +668,19 @@ namespace NovaSaaS.Infrastructure.Persistence
             // =============================================
             // 8. PM Relationships
             // =============================================
+            // Project -> ChartOfAccount (PM → ACC cross-module)
+            modelBuilder.Entity<Project>()
+                .HasOne(p => p.RevenueAccount)
+                .WithMany()
+                .HasForeignKey(p => p.RevenueAccountId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Project>()
+                .HasOne(p => p.ExpenseAccount)
+                .WithMany()
+                .HasForeignKey(p => p.ExpenseAccountId)
+                .OnDelete(DeleteBehavior.Restrict);
+
             modelBuilder.Entity<ProjectPhase>()
                 .HasOne(pp => pp.Project)
                 .WithMany(p => p.Phases)

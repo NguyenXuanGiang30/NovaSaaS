@@ -131,6 +131,12 @@ namespace NovaSaaS.Domain.Entities.HRM
         public virtual ChartOfAccount? SalaryExpenseAccount { get; set; }
 
         /// <summary>
+        /// ID tài khoản ngân hàng chi lương (liên kết ACC module).
+        /// </summary>
+        public Guid? BankAccountId { get; set; }
+        public virtual BankAccount? BankAccount { get; set; }
+
+        /// <summary>
         /// Ghi chú.
         /// </summary>
         [MaxLength(1000)]

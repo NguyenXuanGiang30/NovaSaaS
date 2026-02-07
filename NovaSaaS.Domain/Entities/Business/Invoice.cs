@@ -1,4 +1,5 @@
 using NovaSaaS.Domain.Entities.Common;
+using NovaSaaS.Domain.Entities.PM;
 using NovaSaaS.Domain.Enums;
 using System;
 using System.Collections.Generic;
@@ -83,6 +84,12 @@ namespace NovaSaaS.Domain.Entities.Business
         /// Phương thức thanh toán.
         /// </summary>
         public PaymentMethod PaymentMethod { get; set; } = PaymentMethod.BankTransfer;
+
+        /// <summary>
+        /// ID dự án liên quan (liên kết PM module).
+        /// </summary>
+        public Guid? ProjectId { get; set; }
+        public virtual Project? Project { get; set; }
 
         /// <summary>
         /// Ghi chú.
