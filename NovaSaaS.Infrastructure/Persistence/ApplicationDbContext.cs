@@ -281,6 +281,13 @@ namespace NovaSaaS.Infrastructure.Persistence
                 .HasForeignKey(pt => pt.InvoiceId)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            // PaymentTransaction -> BankAccount (CRM → ACC cross-module)
+            modelBuilder.Entity<PaymentTransaction>()
+                .HasOne(pt => pt.BankAccount)
+                .WithMany(ba => ba.PaymentTransactions)
+                .HasForeignKey(pt => pt.BankAccountId)
+                .OnDelete(DeleteBehavior.Restrict);
+
             // =============================================
             // 4. INV Relationships
             // =============================================
@@ -389,6 +396,20 @@ namespace NovaSaaS.Infrastructure.Persistence
                 .HasOne(p => p.PayrollPeriod)
                 .WithMany(pp => pp.Payrolls)
                 .HasForeignKey(p => p.PayrollPeriodId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // Payroll -> JournalEntry (HRM → ACC cross-module)
+            modelBuilder.Entity<Payroll>()
+                .HasOne(p => p.JournalEntry)
+                .WithMany()
+                .HasForeignKey(p => p.JournalEntryId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // Payroll -> ChartOfAccount (HRM → ACC cross-module)
+            modelBuilder.Entity<Payroll>()
+                .HasOne(p => p.SalaryExpenseAccount)
+                .WithMany()
+                .HasForeignKey(p => p.SalaryExpenseAccountId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<PayrollDetail>()
@@ -536,6 +557,13 @@ namespace NovaSaaS.Infrastructure.Persistence
                 .HasForeignKey(gr => gr.PurchaseOrderId)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            // GoodsReceipt -> Warehouse (SCM → INV cross-module)
+            modelBuilder.Entity<GoodsReceipt>()
+                .HasOne(gr => gr.Warehouse)
+                .WithMany()
+                .HasForeignKey(gr => gr.WarehouseId)
+                .OnDelete(DeleteBehavior.Restrict);
+
             modelBuilder.Entity<GoodsReceiptItem>()
                 .HasOne(gri => gri.GoodsReceipt)
                 .WithMany(gr => gr.Items)
@@ -557,6 +585,13 @@ namespace NovaSaaS.Infrastructure.Persistence
                 .HasOne(vp => vp.Vendor)
                 .WithMany()
                 .HasForeignKey(vp => vp.VendorId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // VendorPayment -> BankAccount (SCM → ACC cross-module)
+            modelBuilder.Entity<VendorPayment>()
+                .HasOne(vp => vp.BankAccount)
+                .WithMany(ba => ba.VendorPayments)
+                .HasForeignKey(vp => vp.BankAccountId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<ReturnToVendor>()
@@ -636,6 +671,13 @@ namespace NovaSaaS.Infrastructure.Persistence
                 .HasForeignKey(ts => ts.ProjectId)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            // Timesheet -> Employee (PM → HRM cross-module)
+            modelBuilder.Entity<Timesheet>()
+                .HasOne(ts => ts.Employee)
+                .WithMany()
+                .HasForeignKey(ts => ts.EmployeeId)
+                .OnDelete(DeleteBehavior.Restrict);
+
             modelBuilder.Entity<TimesheetEntry>()
                 .HasOne(te => te.Timesheet)
                 .WithMany(ts => ts.Entries)
@@ -651,6 +693,20 @@ namespace NovaSaaS.Infrastructure.Persistence
                 .HasOne(pe => pe.Project)
                 .WithMany(p => p.Expenses)
                 .HasForeignKey(pe => pe.ProjectId);
+
+            // ProjectExpense -> JournalEntry (PM → ACC cross-module)
+            modelBuilder.Entity<ProjectExpense>()
+                .HasOne(pe => pe.JournalEntry)
+                .WithMany()
+                .HasForeignKey(pe => pe.JournalEntryId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // ProjectExpense -> ChartOfAccount (PM → ACC cross-module)
+            modelBuilder.Entity<ProjectExpense>()
+                .HasOne(pe => pe.ExpenseAccount)
+                .WithMany()
+                .HasForeignKey(pe => pe.ExpenseAccountId)
+                .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<ProjectComment>()
                 .HasOne(pc => pc.ProjectTask)

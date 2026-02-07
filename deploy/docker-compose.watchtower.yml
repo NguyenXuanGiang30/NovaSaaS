@@ -1,0 +1,22 @@
+version: '3.8'
+
+services:
+  # Watchtower: Tự động cập nhật container khi có Image mới
+  watchtower:
+    image: containrrr/watchtower
+    container_name: watchtower
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: --interval 300 --cleanup # Kiểm tra mỗi 300s (5 phút) và xóa image cũ
+    restart: always
+
+  # NovaSaaS App (Ví dụ)
+  novasaas:
+    image: ghcr.io/nguyenxuangiang30/novasaas:latest
+    container_name: novasaas
+    ports:
+      - "8080:80"
+    environment:
+      - ConnectionStrings__DefaultConnection=Host=host.docker.internal;Port=5432;Database=novasaas_db;Username=postgres;Password=password
+      - JwtSettings__SecretKey=YourSecretKey
+    restart: always

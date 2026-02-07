@@ -1,3 +1,4 @@
+using NovaSaaS.Domain.Entities.Accounting;
 using NovaSaaS.Domain.Entities.Common;
 using System;
 using System.ComponentModel.DataAnnotations;
@@ -98,6 +99,12 @@ namespace NovaSaaS.Domain.Entities.Business
         /// Thời điểm hoàn thành giao dịch.
         /// </summary>
         public DateTime? CompletedAt { get; set; }
+
+        /// <summary>
+        /// ID tài khoản ngân hàng nhận thanh toán (liên kết ACC module).
+        /// </summary>
+        public Guid? BankAccountId { get; set; }
+        public virtual BankAccount? BankAccount { get; set; }
 
         // Navigation
         public virtual Invoice? Invoice { get; set; }

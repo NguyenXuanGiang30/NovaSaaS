@@ -1,4 +1,6 @@
+using NovaSaaS.Domain.Entities.Business;
 using NovaSaaS.Domain.Entities.Common;
+using NovaSaaS.Domain.Entities.SCM;
 using NovaSaaS.Domain.Enums;
 using System;
 using System.Collections.Generic;
@@ -74,5 +76,15 @@ namespace NovaSaaS.Domain.Entities.Accounting
         // Navigation
         public virtual ICollection<BankTransaction> Transactions { get; set; } = new List<BankTransaction>();
         public virtual ICollection<BankReconciliation> Reconciliations { get; set; } = new List<BankReconciliation>();
+
+        /// <summary>
+        /// Thanh toán NCC qua tài khoản này (liên kết SCM module).
+        /// </summary>
+        public virtual ICollection<VendorPayment> VendorPayments { get; set; } = new List<VendorPayment>();
+
+        /// <summary>
+        /// Giao dịch thu tiền khách hàng qua tài khoản này (liên kết CRM module).
+        /// </summary>
+        public virtual ICollection<PaymentTransaction> PaymentTransactions { get; set; } = new List<PaymentTransaction>();
     }
 }

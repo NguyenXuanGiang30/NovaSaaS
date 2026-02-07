@@ -1,3 +1,4 @@
+using NovaSaaS.Domain.Entities.Accounting;
 using NovaSaaS.Domain.Entities.Common;
 using NovaSaaS.Domain.Enums;
 using System;
@@ -49,6 +50,12 @@ namespace NovaSaaS.Domain.Entities.SCM
         /// Trạng thái.
         /// </summary>
         public VendorPaymentStatus Status { get; set; } = VendorPaymentStatus.Pending;
+
+        /// <summary>
+        /// ID tài khoản ngân hàng thanh toán (liên kết ACC module).
+        /// </summary>
+        public Guid? BankAccountId { get; set; }
+        public virtual BankAccount? BankAccount { get; set; }
 
         /// <summary>
         /// Mã giao dịch ngân hàng.

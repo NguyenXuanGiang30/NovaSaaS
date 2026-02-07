@@ -1,3 +1,4 @@
+using NovaSaaS.Domain.Entities.Accounting;
 using NovaSaaS.Domain.Entities.Common;
 using NovaSaaS.Domain.Enums;
 using System;
@@ -116,6 +117,18 @@ namespace NovaSaaS.Domain.Entities.HRM
         /// Ngày thanh toán.
         /// </summary>
         public DateTime? PaidDate { get; set; }
+
+        /// <summary>
+        /// ID bút toán kế toán khi duyệt lương (liên kết ACC module).
+        /// </summary>
+        public Guid? JournalEntryId { get; set; }
+        public virtual JournalEntry? JournalEntry { get; set; }
+
+        /// <summary>
+        /// ID tài khoản kế toán chi phí lương (liên kết ACC module).
+        /// </summary>
+        public Guid? SalaryExpenseAccountId { get; set; }
+        public virtual ChartOfAccount? SalaryExpenseAccount { get; set; }
 
         /// <summary>
         /// Ghi chú.

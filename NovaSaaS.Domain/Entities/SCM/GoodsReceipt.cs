@@ -1,4 +1,5 @@
 using NovaSaaS.Domain.Entities.Common;
+using NovaSaaS.Domain.Entities.Inventory;
 using NovaSaaS.Domain.Enums;
 using System;
 using System.Collections.Generic;
@@ -25,9 +26,10 @@ namespace NovaSaaS.Domain.Entities.SCM
         public virtual PurchaseOrder PurchaseOrder { get; set; } = null!;
 
         /// <summary>
-        /// ID kho nhận hàng.
+        /// ID kho nhận hàng (liên kết INV module).
         /// </summary>
         public Guid WarehouseId { get; set; }
+        public virtual Warehouse Warehouse { get; set; } = null!;
 
         /// <summary>
         /// Ngày nhận hàng.

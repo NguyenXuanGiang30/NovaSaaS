@@ -56,3 +56,40 @@ docker run -p 8080:80 \
   -e JwtSettings__SecretKey="YourSecretKey" \
   ghcr.io/nguyenxuangiang30/novasaas:v1.0.0
 ```
+
+## 6. Thiết lập Tự động Deploy (Gợi ý)
+
+Hiện tại CD mới chỉ **đóng gói** (Push Image). Để **tự động chạy** phiên bản mới trên server, bạn có 2 cách phổ biến:
+
+### Cách 1: Sử dụng Watchtower (Khuyên dùng - Đơn giản nhất)
+Bạn chạy thêm một container tên là **Watchtower** trên server của mình. Nó sẽ tự động kiểm tra xem có Image mới không, nếu có nó sẽ tự pull về và restart app của bạn.
+
+```bash
+# Chạy Watchtower trên server
+docker run -d \
+  --name watchtower \
+  -v /var/run/docker.sock:/var/run/docker.sock \
+  containrrr/watchtower \
+  --interval 300 # Kiểm tra mỗi 5 phút
+```
+
+### Cách 2: Sử dụng SSH Action (Chủ động)
+Cập nhật file `.github/workflows/cd.yml` để SSH vào server và chạy lệnh.
+
+**Yêu cầu:**
+- Cần cung cấp IP Server, Username, và Private Key cho GitHub Secrets.
+- Thêm step vào cuối file `cd.yml`:
+
+```yaml
+    - name: Deploy to Server via SSH
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.SERVER_IP }}
+        username: ${{ secrets.SERVER_USER }}
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        script: |
+          docker pull ghcr.io/nguyenxuangiang30/novasaas:${{ github.ref_name }}
+          docker stop novasaas || true
+          docker rm novasaas || true
+          docker run -d --name novasaas -p 8080:80 ghcr.io/nguyenxuangiang30/novasaas:${{ github.ref_name }}
+```

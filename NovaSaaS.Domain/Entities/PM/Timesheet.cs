@@ -1,4 +1,5 @@
 using NovaSaaS.Domain.Entities.Common;
+using NovaSaaS.Domain.Entities.HRM;
 using NovaSaaS.Domain.Enums;
 using System;
 using System.Collections.Generic;
@@ -15,6 +16,12 @@ namespace NovaSaaS.Domain.Entities.PM
         /// ID User.
         /// </summary>
         public Guid UserId { get; set; }
+
+        /// <summary>
+        /// ID nhân viên (liên kết HRM module).
+        /// </summary>
+        public Guid? EmployeeId { get; set; }
+        public virtual Employee? Employee { get; set; }
 
         /// <summary>
         /// ID dự án.

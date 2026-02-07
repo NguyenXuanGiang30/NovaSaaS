@@ -1,3 +1,4 @@
+using NovaSaaS.Domain.Entities.Accounting;
 using NovaSaaS.Domain.Entities.Common;
 using NovaSaaS.Domain.Enums;
 using System;
@@ -66,6 +67,18 @@ namespace NovaSaaS.Domain.Entities.PM
         /// </summary>
         [MaxLength(10)]
         public string Currency { get; set; } = "VND";
+
+        /// <summary>
+        /// ID bút toán kế toán khi duyệt chi phí (liên kết ACC module).
+        /// </summary>
+        public Guid? JournalEntryId { get; set; }
+        public virtual JournalEntry? JournalEntry { get; set; }
+
+        /// <summary>
+        /// ID tài khoản kế toán chi phí (liên kết ACC module).
+        /// </summary>
+        public Guid? ExpenseAccountId { get; set; }
+        public virtual ChartOfAccount? ExpenseAccount { get; set; }
 
         /// <summary>
         /// Ghi chú.

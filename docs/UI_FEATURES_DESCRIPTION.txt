@@ -1,0 +1,1127 @@
+NOVASAAS - HỆ THỐNG QUẢN LÝ BÁN HÀNG ĐA CHI NHÁNH (MULTI-TENANT SAAS)
+MÔ TẢ ĐẦY ĐỦ CHỨC NĂNG - 32 BẢNG DỮ LIỆU
+
+================================================================================
+TỔNG QUAN HỆ THỐNG
+================================================================================
+
+NovaSaaS là nền tảng quản lý bán hàng đa chi nhánh SaaS với:
+- 32 bảng dữ liệu
+- 6 modules chính
+- 5 loại tác nhân
+- 50 permission codes
+- Real-time notifications
+
+Công nghệ: .NET 10, PostgreSQL, Redis, Gemini AI, SignalR, Stripe
+Giao diện: Web App responsive (Desktop + Tablet + Mobile)
+
+================================================================================
+CẤU TRÚC DATABASE - 32 BẢNG
+================================================================================
+
+SCHEMA PUBLIC (Master Data - 8 bảng):
+1. Tenant - Thông tin doanh nghiệp thuê
+2. SubscriptionPlan - Các gói đăng ký (Basic, Pro, Enterprise)
+3. PlanFeature - Tính năng của từng gói
+4. Payment - Lịch sử thanh toán subscription
+5. MasterAdmin - Tài khoản quản trị hệ thống
+6. GlobalAuditLog - Log thao tác toàn hệ thống
+7. UsageLog - Thống kê sử dụng tài nguyên
+8. SystemLog - Log lỗi và cảnh báo hệ thống
+
+SCHEMA TENANT (Per-Tenant Data - 24 bảng):
+
+Module Identity (7 bảng):
+9. User - Người dùng
+10. Role - Vai trò
+11. Permission - Quyền
+12. UserRole - Liên kết User-Role
+13. RolePermission - Liên kết Role-Permission
+14. RefreshToken - JWT Refresh tokens
+15. InvitationToken - Token mời tham gia
+
+Module Inventory (6 bảng):
+16. Product - Sản phẩm
+17. Category - Danh mục (hỗ trợ cây)
+18. Unit - Đơn vị tính
+19. Warehouse - Kho hàng
+20. Stock - Tồn kho
+21. StockMovement - Lịch sử xuất/nhập kho
+
+Module Business (6 bảng):
+22. Customer - Khách hàng CRM
+23. Order - Đơn hàng
+24. OrderItem - Chi tiết đơn hàng
+25. Invoice - Hóa đơn
+26. Coupon - Mã giảm giá
+27. PaymentTransaction - Giao dịch thanh toán
+
+Module AI (3 bảng):
+28. KnowledgeDocument - Tài liệu AI
+29. DocumentSegment - Chunks với vector embeddings
+30. ChatHistory - Lịch sử chat AI
+
+Module Common (2 bảng):
+31. TenantSetting - Cài đặt tenant
+32. AuditLog - Log thao tác trong tenant
+
+================================================================================
+CÁC TÁC NHÂN VÀ CHỨC NĂNG CHI TIẾT
+================================================================================
+
+████████████████████████████████████████████████████████████████████████████████
+MASTER ADMIN - QUẢN TRỊ VIÊN HỆ THỐNG
+████████████████████████████████████████████████████████████████████████████████
+
+---[ DASHBOARD MASTER ]---
+Layout: 
+- Header với logo NovaSaaS, avatar admin
+- Sidebar menu bên trái
+- Content area chính
+
+Thống kê cards (4 cards hàng ngang):
+- Tổng số Tenants | Tenants hoạt động | Tenants bị suspend | Tenants sắp hết hạn
+
+Biểu đồ:
+- Line chart: Tăng trưởng tenants theo tháng (12 tháng)
+- Bar chart: Doanh thu subscription theo tháng
+- Pie chart: Phân bổ tenants theo gói (Basic/Pro/Enterprise)
+
+Bảng Tenants sắp hết hạn (5 dòng):
+- Cột: Tên, Subdomain, Gói, Ngày hết hạn, Actions (Gia hạn, Liên hệ)
+
+Bảng System Alerts gần đây:
+- Cột: Thời gian, Level (Error/Warning), Message, Tenant
+
+---[ QUẢN LÝ TENANTS ]---
+Bảng danh sách (phân trang 20/page):
+- Cột: Checkbox, Tên tenant, Subdomain, Email liên hệ, Gói, Trạng thái (badge), Số users, Ngày tạo, Ngày hết hạn, Actions
+
+Thanh công cụ:
+- Search box (tìm theo tên, subdomain, email)
+- Dropdown filter: Trạng thái (All, Active, Suspended, Expired)
+- Dropdown filter: Gói (All, Basic, Pro, Enterprise)
+- Nút Export Excel
+- Nút Bulk Actions (Suspend selected, Activate selected)
+
+Actions dropdown mỗi row:
+- Xem chi tiết
+- Sửa thông tin
+- Suspend / Activate
+- Gia hạn subscription
+- Xem usage logs
+- Xóa tenant (có confirm modal)
+
+---[ CHI TIẾT TENANT ]---
+Tab 1 - Thông tin cơ bản:
+- Tên tenant, Subdomain, Schema name
+- Email liên hệ, SĐT
+- Logo tenant
+- Ngày tạo, Ngày hết hạn
+- Trạng thái (badge)
+- Nút: Sửa, Suspend/Activate
+
+Tab 2 - Subscription:
+- Gói hiện tại với chi tiết features
+- Lịch sử thay đổi gói
+- Nút: Nâng cấp gói, Hạ cấp gói, Gia hạn
+
+Tab 3 - Usage Statistics:
+- Biểu đồ API calls theo ngày (30 ngày)
+- Biểu đồ Storage usage
+- Bảng: Số users, Số products, Số orders, Số documents AI
+- So sánh với giới hạn của gói
+
+Tab 4 - Payment History:
+- Bảng: Ngày, Số tiền, Gói, Trạng thái, Gateway, Transaction ID
+- Nút: Tạo invoice thủ công
+
+Tab 5 - Audit Logs:
+- Bảng: Thời gian, User, Action, Entity, Old value, New value
+
+---[ QUẢN LÝ SUBSCRIPTION PLANS ]---
+Danh sách 3 cards (Basic, Pro, Enterprise):
+- Tên gói, Giá/tháng, Giá/năm
+- Số tenants đang dùng (badge)
+- Danh sách features (checkmarks)
+- Nút: Sửa, Xem chi tiết
+
+Form sửa gói:
+- Tên gói
+- Giá tháng, Giá năm
+- Max users
+- Max products
+- Max storage (GB)
+- Max API calls/day
+- Toggle features: AI Chat, Document Upload, Reports Export, Multi-warehouse
+
+---[ QUẢN LÝ PLAN FEATURES ]---
+Bảng features:
+- Cột: Tên feature, Code, Mô tả, Gói áp dụng (checkboxes)
+- Actions: Sửa, Xóa
+
+Form thêm/sửa feature:
+- Tên feature
+- Code (unique)
+- Mô tả
+- Checkboxes: Áp dụng cho Basic, Pro, Enterprise
+
+---[ PAYMENT HISTORY (MASTER) ]---
+Bảng lịch sử thanh toán toàn hệ thống:
+- Cột: Tenant, Ngày, Số tiền, Gói, Trạng thái, Gateway, Transaction ID
+- Filter: Khoảng thời gian, Trạng thái, Gateway
+- Export Excel
+
+Thống kê:
+- Tổng doanh thu tháng này
+- So sánh với tháng trước (%)
+- MRR (Monthly Recurring Revenue)
+
+---[ GLOBAL AUDIT LOGS ]---
+Bảng logs toàn hệ thống:
+- Cột: Thời gian, Admin, Action, Target tenant, Details
+- Filter: Khoảng thời gian, Action type
+- Search: Theo nội dung
+
+---[ USAGE LOGS ]---
+Bảng thống kê sử dụng:
+- Cột: Tenant, Ngày, API calls, Storage used, Active users
+- Filter: Tenant, Khoảng thời gian
+- Biểu đồ so sánh usage vs limits
+
+---[ SYSTEM LOGS ]---
+Bảng logs hệ thống:
+- Cột: Thời gian, Level (color coded), Source, Message, Tenant, Stack trace (expand)
+- Filter: Level (Error, Warning, Info, Debug), Tenant, Source
+- Search: Theo message
+- Nút: Clear old logs
+
+---[ DATABASE MIGRATIONS ]---
+Danh sách tenants và version hiện tại:
+- Cột: Tenant, Schema, Current version, Latest version, Status
+- Actions: Run migration, View history
+
+Nút: Run All Migrations (có confirm)
+Progress bar khi đang chạy
+Log output real-time
+
+---[ HANGFIRE DASHBOARD ]---
+Tabs:
+- Jobs: Scheduled, Enqueued, Processing, Succeeded, Failed
+- Recurring Jobs: Danh sách jobs định kỳ
+- Servers: Danh sách workers
+
+Mỗi job hiển thị:
+- Job name, Parameters, Created, Processing time, Status
+- Actions: Requeue, Delete
+
+---[ QUẢN LÝ MASTER ADMINS ]---
+Bảng admins:
+- Cột: Tên, Email, Trạng thái, Ngày tạo, Last login
+- Actions: Sửa, Reset password, Disable
+
+Form thêm admin:
+- Họ tên, Email, Password, Confirm password
+
+
+████████████████████████████████████████████████████████████████████████████████
+TENANT ADMIN - QUẢN TRỊ VIÊN DOANH NGHIỆP
+████████████████████████████████████████████████████████████████████████████████
+
+---[ DASHBOARD TENANT ]---
+Welcome message: "Chào mừng, [Tên Admin]!"
+
+Stats cards (5 cards):
+- Doanh thu hôm nay | Doanh thu tháng này | Đơn hàng mới | Sản phẩm sắp hết | Khách hàng mới
+
+Biểu đồ Row 1 (2 charts):
+- Line chart: Doanh thu 30 ngày gần nhất
+- Bar chart: Top 10 sản phẩm bán chạy
+
+Biểu đồ Row 2 (2 charts):
+- Pie chart: Doanh thu theo danh mục
+- Line chart: Số đơn hàng theo ngày
+
+Bảng Đơn hàng gần đây (10 rows):
+- Cột: Mã đơn, Khách hàng, Tổng tiền, Trạng thái, Thời gian
+- Link: Xem tất cả
+
+Bảng Sản phẩm sắp hết hàng (5 rows):
+- Cột: Tên, SKU, Tồn kho, Ngưỡng cảnh báo
+- Link: Điều chỉnh tồn kho
+
+---[ QUẢN LÝ USERS ]---
+Bảng users:
+- Cột: Avatar, Họ tên, Email, Roles (badges), Trạng thái, Ngày tạo, Last login, Actions
+- Search: Theo tên, email
+- Filter: Role, Trạng thái
+
+Nút toolbar:
+- Thêm user
+- Import từ Excel
+- Export Excel
+- Gửi lời mời hàng loạt
+
+Actions mỗi row:
+- Xem chi tiết
+- Sửa
+- Đổi role
+- Reset password
+- Disable/Enable
+- Xóa
+
+Form thêm/sửa user:
+- Avatar upload
+- Họ tên (required)
+- Email (required, unique)
+- Password / Auto-generate
+- Chọn roles (multi-select)
+- Trạng thái active
+
+---[ CHI TIẾT USER ]---
+Tab Profile:
+- Thông tin cá nhân
+- Roles hiện tại
+- Quyền (permissions list)
+
+Tab Activity:
+- Bảng hoạt động gần đây
+- Login history
+
+Tab Settings:
+- Notification preferences
+- Language preference
+
+---[ QUẢN LÝ INVITATION TOKENS ]---
+Bảng lời mời:
+- Cột: Email được mời, Role, Token, Trạng thái, Ngày tạo, Ngày hết hạn
+- Actions: Gửi lại, Hủy, Copy link
+
+Nút: Gửi lời mời mới
+Form:
+- Email (có thể nhập nhiều, phân cách bằng dấu phẩy)
+- Chọn role
+- Message tùy chọn
+
+---[ QUẢN LÝ ROLES ]---
+Danh sách roles (cards hoặc table):
+- Tên role, Mô tả, Số users, Số permissions
+- Badge: System role (không thể xóa) vs Custom role
+- Actions: Sửa, Clone, Xóa
+
+Default roles:
+- Admin (system) - Full access
+- Manager (system) - Quản lý nghiệp vụ
+- Staff (system) - Nhân viên
+- User (system) - Người dùng cơ bản
+
+Form thêm/sửa role:
+- Tên role
+- Mô tả
+- Chọn permissions (grouped checkboxes)
+
+---[ QUẢN LÝ PERMISSIONS ]---
+Bảng permissions:
+- Cột: Code, Mô tả, Module, Roles có permission này
+
+Nhóm permissions:
+
+IDENTITY:
+- users.read - Xem danh sách users
+- users.create - Tạo user mới
+- users.update - Cập nhật user
+- users.delete - Xóa user
+- roles.read - Xem roles
+- roles.create - Tạo role
+- roles.update - Sửa role
+- roles.delete - Xóa role
+- permissions.read - Xem permissions
+- permissions.assign - Gán permissions
+
+INVENTORY:
+- products.read - Xem sản phẩm
+- products.create - Thêm sản phẩm
+- products.update - Sửa sản phẩm
+- products.delete - Xóa sản phẩm
+- categories.read - Xem danh mục
+- categories.manage - CRUD danh mục
+- units.read - Xem đơn vị
+- units.manage - CRUD đơn vị
+- warehouses.read - Xem kho
+- warehouses.manage - CRUD kho
+- stocks.read - Xem tồn kho
+- stocks.adjust - Điều chỉnh tồn
+- stocks.transfer - Chuyển kho
+
+SALES:
+- orders.read - Xem đơn hàng
+- orders.create - Tạo đơn hàng
+- orders.update - Cập nhật đơn
+- orders.delete - Hủy đơn
+- invoices.read - Xem hóa đơn
+- invoices.create - Tạo hóa đơn
+- invoices.update - Cập nhật hóa đơn
+- coupons.read - Xem coupons
+- coupons.manage - CRUD coupons
+- payments.process - Xử lý thanh toán
+
+CRM:
+- customers.read - Xem khách hàng
+- customers.create - Thêm khách hàng
+- customers.update - Cập nhật khách
+- customers.delete - Xóa khách hàng
+
+AI:
+- documents.read - Xem tài liệu AI
+- documents.upload - Upload tài liệu
+- documents.delete - Xóa tài liệu
+- chat.use - Sử dụng AI chat
+- chat.functions - Chat với functions
+
+REPORTS:
+- dashboard.view - Xem dashboard
+- reports.revenue - Báo cáo doanh thu
+- reports.products - Báo cáo sản phẩm
+- reports.customers - Báo cáo khách hàng
+- reports.export - Xuất báo cáo
+
+SETTINGS:
+- settings.read - Xem cài đặt
+- settings.update - Cập nhật cài đặt
+- auditlogs.read - Xem audit logs
+
+---[ MA TRẬN PHÂN QUYỀN ]---
+Bảng matrix:
+- Rows: Tất cả permissions (50)
+- Columns: Tất cả roles
+- Cells: Checkboxes
+- Có thể sửa trực tiếp trên matrix
+- Nút Save changes
+
+---[ CÀI ĐẶT TENANT (TenantSetting) ]---
+Tab Thông tin công ty:
+- Logo (upload)
+- Tên công ty
+- Địa chỉ
+- Số điện thoại
+- Email
+- Mã số thuế
+- Website
+
+Tab Giao diện:
+- Primary color (color picker)
+- Secondary color
+- Theme mode: Light / Dark / Auto
+- Sidebar style: Full / Collapsed / Mini
+
+Tab Thông báo:
+- Toggle: Email khi có đơn hàng mới
+- Toggle: Email khi sản phẩm sắp hết
+- Toggle: Email báo cáo hàng tuần
+- Toggle: Email nhắc hóa đơn quá hạn
+
+Tab Regional:
+- Ngôn ngữ: Tiếng Việt / English
+- Múi giờ
+- Định dạng tiền tệ
+- Định dạng ngày tháng
+
+Tab Subscription:
+- Gói hiện tại (card details)
+- Usage vs Limits (progress bars)
+- Ngày hết hạn
+- Nút: Nâng cấp, Gia hạn
+
+Tab API:
+- API Key (masked, có nút copy)
+- Regenerate API Key
+- Webhook URL configuration
+
+---[ AUDIT LOGS TENANT ]---
+Bảng logs:
+- Cột: Thời gian, User, Action, Entity, Entity ID, Old values (JSON expand), New values (JSON expand)
+- Filter: User, Entity type, Action, Khoảng thời gian
+- Search: Theo nội dung
+- Export
+
+---[ REFRESH TOKENS MANAGEMENT ]---
+Bảng active sessions:
+- Cột: User, Device/Browser, IP, Created, Last used, Expires
+- Actions: Revoke session
+
+Nút: Revoke all sessions (trừ current)
+
+---[ BÁO CÁO DOANH THU ]---
+Thanh filter:
+- Date range picker (presets: Hôm nay, 7 ngày, 30 ngày, Tháng này, Quý này, Năm này, Custom)
+- Filter: Nhân viên, Khách hàng, Danh mục sản phẩm
+
+Summary cards:
+- Tổng doanh thu
+- Số đơn hàng
+- Giá trị trung bình/đơn
+- So sánh với kỳ trước (%)
+
+Biểu đồ:
+- Line/Bar chart doanh thu theo thời gian
+- Toggle: Theo ngày / Tuần / Tháng
+
+Bảng chi tiết:
+- Theo ngày/tuần/tháng
+- Cột: Thời gian, Số đơn, Doanh thu, TB/đơn
+
+Nút: Xuất Excel, Xuất PDF
+
+---[ BÁO CÁO SẢN PHẨM ]---
+Top sản phẩm bán chạy:
+- Bảng: Rank, Sản phẩm, SKU, Số lượng bán, Doanh thu
+- Pie chart top 10
+
+Sản phẩm không bán được (30 ngày):
+- Danh sách sản phẩm không có đơn hàng
+
+Phân tích theo danh mục:
+- Bảng: Danh mục, Số SP, Số bán, Doanh thu, % tổng
+
+---[ BÁO CÁO KHÁCH HÀNG ]---
+Top khách hàng:
+- Bảng: Rank, Khách hàng, Số đơn, Tổng chi tiêu
+
+Phân loại khách hàng:
+- Pie chart: VIP / Regular / New / Inactive
+
+Khách hàng mới:
+- Biểu đồ tăng trưởng theo tháng
+
+---[ QUẢN LÝ TÀI LIỆU AI (KnowledgeDocument) ]---
+Danh sách tài liệu:
+- Cột: Icon file type, Tên file, Loại, Kích thước, Trạng thái (Processing/Completed/Failed), Số chunks, Ngày upload
+- Actions: Xem chi tiết, Reprocess, Xóa
+
+Nút: Upload tài liệu (chấp nhận PDF, DOCX, TXT, max 10MB)
+Drag & drop zone
+
+Chi tiết tài liệu:
+- Thông tin file
+- Danh sách chunks (DocumentSegment)
+- Preview nội dung
+
+---[ DOCUMENT SEGMENTS ]---
+Bảng chunks của 1 document:
+- Cột: Chunk index, Preview content (truncated), Token count, Has embedding
+- Expand: Xem full content
+
+---[ AI CHAT ]---
+Layout:
+- Sidebar trái: Danh sách conversations (ChatHistory grouped by session)
+- Main: Chat interface
+
+Chat interface:
+- Messages với avatar (User vs AI)
+- Markdown rendering cho AI responses
+- Code blocks với syntax highlighting
+- Bảng data inline
+
+Input area:
+- Textarea (auto-expand)
+- Nút gửi
+- Toggle: Use RAG context
+
+Sidebar conversations:
+- Nhóm theo ngày
+- Rename conversation
+- Delete conversation
+- New conversation button
+
+---[ AI CHAT WITH FUNCTIONS ]---
+Giống AI Chat nhưng có thêm:
+- AI có thể hiển thị kết quả function calls
+- Ví dụ: Bảng stock, bảng orders
+- Loading indicator khi đang call function
+
+Functions available:
+- GetStockByProduct - Tra cứu tồn kho
+- GetOrdersByCustomer - Đơn hàng của khách
+- GetSalesReport - Báo cáo doanh thu
+- GetLowStockProducts - Sản phẩm sắp hết
+- GetTopProducts - Top sản phẩm
+- SearchProducts - Tìm sản phẩm
+
+
+████████████████████████████████████████████████████████████████████████████████
+MANAGER - QUẢN LÝ
+████████████████████████████████████████████████████████████████████████████████
+
+---[ DASHBOARD MANAGER ]---
+Stats cards:
+- Đơn hàng hôm nay | Doanh thu hôm nay | Sản phẩm sắp hết | Khách hàng mới
+
+Quick actions:
+- Tạo đơn hàng nhanh
+- Thêm sản phẩm
+- Điều chỉnh tồn kho
+
+Alerts:
+- Danh sách cảnh báo tồn kho thấp
+- Đơn hàng cần xử lý
+
+---[ QUẢN LÝ SẢN PHẨM (Product) ]---
+Toolbar:
+- Search (tên, SKU, barcode)
+- Filter: Danh mục (tree dropdown), Trạng thái tồn, Khoảng giá
+- View toggle: Grid / List
+- Sort: Tên, Giá, Tồn kho, Ngày tạo
+- Nút: Thêm mới, Import Excel, Export
+
+Grid view:
+- Cards với hình ảnh, tên, giá, tồn kho, actions
+
+List view (bảng):
+- Cột: Checkbox, Ảnh thumbnail, SKU, Barcode, Tên, Danh mục, Đơn vị, Giá bán, Tồn kho, Actions
+- Bulk actions: Xóa, Cập nhật giá, Cập nhật danh mục
+
+Form thêm/sửa sản phẩm:
+Section 1 - Thông tin cơ bản:
+- Tên sản phẩm (required)
+- Mô tả ngắn
+- Mô tả chi tiết (rich text editor)
+
+Section 2 - Mã & Phân loại:
+- SKU (auto-generate hoặc nhập)
+- Barcode (có nút scan)
+- Danh mục (tree selector)
+- Đơn vị tính (dropdown)
+
+Section 3 - Giá:
+- Giá bán
+- Giá gốc (cost)
+- Giá khuyến mãi
+- Ngày bắt đầu/kết thúc KM
+
+Section 4 - Hình ảnh:
+- Upload multiple (drag & drop)
+- Reorder images
+- Set ảnh chính
+
+Section 5 - Tồn kho:
+- Bảng: Kho, Số lượng, Ngưỡng cảnh báo
+- Tổng tồn kho
+
+Section 6 - SEO (optional):
+- Meta title
+- Meta description
+
+---[ CHI TIẾT SẢN PHẨM ]---
+Tab Thông tin:
+- Tất cả thông tin sản phẩm
+- Gallery ảnh
+
+Tab Tồn kho:
+- Bảng tồn theo kho
+- Lịch sử xuất/nhập (StockMovement)
+
+Tab Lịch sử giá:
+- Timeline thay đổi giá
+
+Tab Đơn hàng:
+- Danh sách đơn hàng có sản phẩm này
+
+---[ QUẢN LÝ DANH MỤC (Category) ]---
+Tree view:
+- Danh mục dạng cây (có thể expand/collapse)
+- Drag & drop để thay đổi vị trí
+- Hiển thị số sản phẩm mỗi danh mục
+
+Actions mỗi node:
+- Thêm danh mục con
+- Sửa
+- Xóa (confirm nếu có SP)
+- Di chuyển
+
+Form danh mục:
+- Tên danh mục
+- Danh mục cha (dropdown tree)
+- Icon (icon picker)
+- Mô tả
+- Thứ tự hiển thị
+
+---[ QUẢN LÝ ĐƠN VỊ TÍNH (Unit) ]---
+Bảng đơn giản:
+- Cột: Tên đầy đủ, Ký hiệu, Số SP sử dụng, Actions
+- Ví dụ: Cái (Pcs), Hộp (Box), Kilogram (Kg), Lít (L), Bộ (Set)
+
+Form:
+- Tên đầy đủ
+- Ký hiệu (viết tắt)
+
+---[ QUẢN LÝ KHO (Warehouse) ]---
+Danh sách kho (cards):
+- Tên kho
+- Địa chỉ
+- Badge: Kho mặc định
+- Số sản phẩm
+- Tổng giá trị tồn kho
+- Actions: Sửa, Xem tồn kho, Xóa
+
+Form kho:
+- Tên kho
+- Địa chỉ
+- Toggle: Là kho mặc định
+- Ghi chú
+
+---[ TỒN KHO (Stock) ]---
+Bảng tồn kho:
+- Cột: Sản phẩm (ảnh, tên, SKU), Kho, Số lượng, Ngưỡng cảnh báo, Trạng thái (color badge)
+- Trạng thái: Hết hàng (đỏ), Sắp hết (vàng), Đủ (xanh)
+- Filter: Kho, Danh mục, Trạng thái
+- Search: Tên, SKU
+
+Actions:
+- Điều chỉnh số lượng
+- Chuyển kho
+
+Nút toolbar:
+- Điều chỉnh hàng loạt
+- Kiểm kê
+- Export Excel
+
+---[ LỊCH SỬ XUẤT/NHẬP (StockMovement) ]---
+Bảng:
+- Cột: Thời gian, Sản phẩm, Kho, Loại (Nhập/Xuất/Chuyển/Kiểm kê), Số lượng (+/-), Số lượng sau, Người thực hiện, Reference (Order ID...), Ghi chú
+- Filter: Loại, Kho, Khoảng thời gian
+- Export
+
+---[ POPUP ĐIỀU CHỈNH TỒN KHO ]---
+- Chọn sản phẩm (autocomplete với search)
+- Chọn kho
+- Số lượng hiện tại (readonly)
+- Loại điều chỉnh: Nhập thêm / Xuất bớt / Kiểm kê (set chính xác)
+- Số lượng điều chỉnh
+- Số lượng sau điều chỉnh (preview)
+- Ghi chú / Lý do
+- Nút: Xác nhận
+
+---[ POPUP CHUYỂN KHO ]---
+- Chọn sản phẩm
+- Từ kho (dropdown, hiển thị số lượng hiện tại)
+- Đến kho (dropdown)
+- Số lượng chuyển
+- Ghi chú
+- Nút: Xác nhận
+
+---[ QUẢN LÝ ĐƠN HÀNG (Order) ]---
+Tabs filter:
+- Tất cả | Chờ xác nhận | Đã xác nhận | Đang giao | Hoàn thành | Đã hủy
+
+Mỗi tab hiển thị số lượng (badge)
+
+Bảng:
+- Cột: Mã đơn, Khách hàng, Tổng tiền, Trạng thái (badge màu), Ngày tạo, Người tạo, Actions
+- Search: Mã đơn, Tên khách
+- Filter: Khoảng thời gian, Người tạo
+
+Actions:
+- Xem chi tiết
+- Cập nhật trạng thái
+- Tạo hóa đơn
+- In đơn hàng
+- Hủy đơn
+
+---[ TẠO ĐƠN HÀNG ]---
+Layout 2 cột:
+Cột trái (70%):
+- Chọn khách hàng (autocomplete) hoặc nút "Thêm khách mới"
+- Thông tin khách: Tên, SĐT, Địa chỉ (nếu đã chọn)
+
+- Tìm sản phẩm (search bar với autocomplete)
+- Bảng sản phẩm đã chọn:
+  - Cột: Ảnh, Tên, Đơn giá, Số lượng (input), Giảm giá, Thành tiền, Xóa
+  - Có thể sửa số lượng inline
+
+- Ghi chú đơn hàng (textarea)
+
+Cột phải (30%) - sticky:
+- Tổng tiền hàng
+- Mã coupon (input + nút Apply)
+- Giảm giá coupon
+- Phí vận chuyển
+- Tổng thanh toán
+- Nút: Lưu nháp, Tạo đơn
+
+---[ CHI TIẾT ĐƠN HÀNG ]---
+Header:
+- Mã đơn, Trạng thái (badge), Ngày tạo
+- Nút: Cập nhật trạng thái, In, Tạo hóa đơn
+
+Section 1 - Thông tin khách hàng:
+- Tên, SĐT, Email, Địa chỉ
+
+Section 2 - Danh sách sản phẩm (OrderItem):
+- Bảng: Ảnh, Tên, SKU, Đơn giá, Số lượng, Giảm giá, Thành tiền
+
+Section 3 - Tổng tiền:
+- Tổng tiền hàng
+- Giảm giá
+- Phí vận chuyển
+- Tổng thanh toán
+
+Section 4 - Timeline trạng thái:
+- Vertical timeline với các bước trạng thái
+- Mỗi bước: Trạng thái, Thời gian, Người thực hiện, Ghi chú
+
+---[ QUẢN LÝ HÓA ĐƠN (Invoice) ]---
+Tabs:
+- Tất cả | Chưa thanh toán | Đã thanh toán | Quá hạn | Đã hủy
+
+Bảng:
+- Cột: Mã hóa đơn, Đơn hàng liên quan, Khách hàng, Tổng tiền, Ngày tạo, Hạn thanh toán, Trạng thái, Actions
+- Actions: Xem, Đánh dấu đã TT, Gửi email nhắc, In, Hủy
+
+---[ CHI TIẾT HÓA ĐƠN ]---
+Header:
+- Logo công ty, Thông tin công ty
+- Mã hóa đơn, Ngày tạo, Hạn TT
+
+Body:
+- Thông tin khách hàng
+- Bảng sản phẩm (giống OrderItem)
+- Tổng tiền
+
+Footer:
+- Thông tin ngân hàng
+- QR code thanh toán (nếu có)
+
+Actions:
+- Đánh dấu đã thanh toán
+- In PDF
+- Gửi email
+
+---[ QUẢN LÝ KHÁCH HÀNG (Customer) ]---
+Bảng:
+- Cột: Avatar/Icon, Tên, SĐT, Email, Loại (Individual/Company), Tổng chi tiêu, Số đơn, Ngày tạo, Actions
+- Filter: Loại, Mức chi tiêu (VIP/Regular/New)
+- Search: Tên, SĐT, Email
+- Export
+
+Form khách hàng:
+- Loại: Cá nhân / Doanh nghiệp (radio)
+- Tên
+- SĐT, Email
+- Địa chỉ
+- Mã số thuế (nếu doanh nghiệp)
+- Ghi chú
+
+---[ CHI TIẾT KHÁCH HÀNG ]---
+Tab Thông tin:
+- Thông tin cơ bản
+- Phân loại: VIP/Regular/New (based on TotalSpending)
+
+Tab Đơn hàng:
+- Danh sách đơn hàng của khách
+
+Tab Thống kê:
+- Tổng chi tiêu
+- Số đơn hàng
+- Giá trị trung bình
+- Sản phẩm mua nhiều nhất
+
+---[ QUẢN LÝ COUPON (Coupon) ]---
+Bảng:
+- Cột: Code, Loại giảm (icon), Giá trị, Đơn tối thiểu, Ngày hết hạn, Đã sử dụng/Giới hạn, Trạng thái, Actions
+- Actions: Sửa, Copy code, Disable, Xóa
+
+Form coupon:
+- Mã coupon (hoặc auto-generate)
+- Loại giảm: Phần trăm / Số tiền cố định
+- Giá trị giảm
+- Giảm tối đa (nếu %)
+- Đơn tối thiểu
+- Ngày bắt đầu - Ngày kết thúc
+- Giới hạn số lần sử dụng tổng
+- Giới hạn số lần/khách
+- Áp dụng cho: Tất cả / Danh mục cụ thể / Sản phẩm cụ thể
+
+---[ GIAO DỊCH THANH TOÁN (PaymentTransaction) ]---
+Bảng:
+- Cột: Thời gian, Invoice, Số tiền, Gateway (Stripe/Cash/Transfer), Trạng thái, Transaction ID
+- Filter: Gateway, Trạng thái, Khoảng thời gian
+
+Chi tiết:
+- Thông tin đầy đủ từ payment gateway
+- Timeline trạng thái
+
+---[ AI CHAT (cho Manager) ]---
+Giống Tenant Admin nhưng không có upload documents
+
+
+████████████████████████████████████████████████████████████████████████████████
+STAFF - NHÂN VIÊN
+████████████████████████████████████████████████████████████████████████████████
+
+---[ DASHBOARD STAFF ]---
+Stats cards (đơn giản hơn):
+- Đơn hàng tôi tạo hôm nay
+- Doanh số tôi hôm nay
+
+Quick actions:
+- Tạo đơn hàng
+- Thêm khách hàng
+
+My recent orders (10 rows)
+
+---[ POS - BÁN HÀNG NHANH ]---
+Layout fullscreen, 2 sections:
+
+Section trái (60%) - Danh sách sản phẩm:
+- Search bar (tên, SKU, barcode)
+- Category filter (pills hoặc dropdown)
+- Grid sản phẩm (cards nhỏ):
+  - Ảnh, Tên, Giá, Tồn kho
+  - Click để thêm vào giỏ
+- Có thể quét barcode
+
+Section phải (40%) - Giỏ hàng:
+- Header: Chọn khách hàng (autocomplete) hoặc "Khách lẻ"
+- Danh sách sản phẩm trong giỏ:
+  - Tên, Giá, Số lượng (+/-), Thành tiền, Xóa
+- Input mã coupon + Apply
+- Divider
+- Tổng tiền hàng
+- Giảm giá
+- Tổng thanh toán (font lớn)
+- Nút: Hủy giỏ, Thanh toán
+
+---[ POPUP THANH TOÁN ]---
+- Tổng tiền cần thanh toán
+- Phương thức: Tiền mặt / Chuyển khoản / Stripe
+- Nếu tiền mặt:
+  - Nhập số tiền khách đưa
+  - Tự động tính tiền thừa
+- Nếu Stripe:
+  - Redirect đến Stripe checkout
+- Nút: Xác nhận, In hóa đơn sau khi thành công
+
+---[ XEM TỒN KHO (chỉ đọc) ]---
+Bảng giống Manager nhưng:
+- Không có actions điều chỉnh
+- Không có nút import/export
+
+---[ DANH SÁCH ĐƠN HÀNG CỦA TÔI ]---
+Bảng đơn hàng:
+- Chỉ hiển thị đơn do Staff này tạo
+- Actions: Xem chi tiết
+
+---[ TẠO ĐƠN HÀNG ]---
+Giống Manager
+
+---[ QUẢN LÝ KHÁCH HÀNG (hạn chế) ]---
+- Có thể xem và thêm mới
+- Không thể sửa hoặc xóa (tùy permission)
+
+---[ AI CHAT (đơn giản) ]---
+- Chat cơ bản
+- Không có function calling
+- Có thể hỏi về sản phẩm, tồn kho
+
+---[ THÔNG BÁO ]---
+Header: Icon chuông với badge số unread
+
+Dropdown/Page thông báo:
+- Danh sách thông báo
+- Mỗi item: Icon, Title, Message preview, Time ago, Read status
+- Click để mark as read
+- Link "Đánh dấu tất cả đã đọc"
+
+
+████████████████████████████████████████████████████████████████████████████████
+CUSTOMER - KHÁCH HÀNG (Không có tài khoản)
+████████████████████████████████████████████████████████████████████████████████
+
+Customer không đăng nhập vào hệ thống.
+Họ tương tác thông qua:
+- Staff tạo đơn hàng cho họ
+- Nhận email thông báo đơn hàng
+- Nhận email hóa đơn
+- Thanh toán qua Stripe (nếu được gửi link)
+
+Email templates:
+- Welcome (khi được thêm làm KH)
+- Order confirmation
+- Invoice
+- Payment reminder
+- Payment success
+
+
+================================================================================
+THÀNH PHẦN CHUNG (SHARED COMPONENTS)
+================================================================================
+
+---[ HEADER ]---
+- Logo tenant (link về dashboard)
+- Search global (tìm SP, KH, Đơn hàng)
+- Icon thông báo (badge số unread)
+- Avatar + Dropdown:
+  - Tên user, Role
+  - My Profile
+  - Settings
+  - Theme toggle
+  - Logout
+
+---[ SIDEBAR ]---
+- Logo (thu gọn khi collapsed)
+- Menu items với icons
+- Active item highlighted
+- Có thể collapse
+- Nhóm menu:
+  - Dashboard
+  - Bán hàng (POS, Đơn hàng, Hóa đơn)
+  - Kho hàng (Sản phẩm, Danh mục, Tồn kho, Kho)
+  - Khách hàng
+  - Marketing (Coupons)
+  - AI (Documents, Chat)
+  - Báo cáo
+  - Cài đặt (Users, Roles, Settings, Logs)
+
+---[ BREADCRUMB ]---
+- Home > Products > Add new
+- Clickable links
+
+---[ PAGE HEADER ]---
+- Title + Description
+- Action buttons (right side)
+
+---[ DATA TABLE ]---
+- Header với sort
+- Rows với hover effect
+- Pagination
+- Items per page selector
+- Bulk selection với checkboxes
+- Loading skeleton
+
+---[ FORMS ]---
+- Labels với required indicator (*)
+- Input states: default, focus, error, disabled
+- Validation messages
+- Submit button với loading state
+
+---[ MODALS/DIALOGS ]---
+- Overlay background
+- Close button (X)
+- Header, Body, Footer
+- Confirm dialogs với icon
+
+---[ TOASTS/NOTIFICATIONS ]---
+- Success (green)
+- Error (red)
+- Warning (yellow)
+- Info (blue)
+- Position: top-right
+- Auto dismiss
+
+---[ CARDS ]---
+- Shadow, border-radius
+- Header, Body, Footer (optional)
+
+---[ BADGES/TAGS ]---
+- Color coded by status
+- Rounded pills
+
+---[ EMPTY STATES ]---
+- Illustration
+- Message
+- Action button
+
+---[ LOADING STATES ]---
+- Skeleton loaders
+- Spinner
+- Progress bar
+
+
+================================================================================
+RESPONSIVE DESIGN
+================================================================================
+
+Desktop (>1200px):
+- Full sidebar
+- Multi-column layouts
+
+Tablet (768-1200px):
+- Collapsed sidebar (icons only)
+- Stacked layouts where needed
+
+Mobile (<768px):
+- Bottom navigation hoặc hamburger menu
+- Single column layouts
+- Tables chuyển thành cards
+- Modals chuyển thành full-screen
+- POS layout stack vertically
+
+
+================================================================================
+BẢNG MÀU
+================================================================================
+
+Primary: #6366F1 (Indigo)
+Primary light: #A5B4FC
+Primary dark: #4338CA
+
+Secondary: #10B981 (Emerald)
+Accent: #F59E0B (Amber)
+Error: #EF4444 (Red)
+Warning: #F59E0B (Amber)
+Success: #10B981 (Green)
+Info: #3B82F6 (Blue)
+
+Background: #F8FAFC
+Surface: #FFFFFF
+Text primary: #1E293B
+Text secondary: #64748B
+Border: #E2E8F0
+
+Dark mode:
+Background: #0F172A
+Surface: #1E293B
+Text primary: #F8FAFC
+Text secondary: #94A3B8
+
+
+================================================================================
+TYPOGRAPHY
+================================================================================
+
+Font family: Inter, system-ui, sans-serif
+
+Headings:
+- H1: 36px, bold
+- H2: 30px, semibold
+- H3: 24px, semibold
+- H4: 20px, medium
+
+Body:
+- Large: 18px
+- Default: 16px
+- Small: 14px
+- Tiny: 12px
+
+
+================================================================================
+REAL-TIME FEATURES (SignalR)
+================================================================================
+
+Events:
+- OrderCreated - Thông báo khi có đơn hàng mới
+- OrderStatusChanged - Khi trạng thái đơn thay đổi
+- StockUpdated - Khi tồn kho thay đổi
+- LowStockAlert - Cảnh báo sản phẩm sắp hết
+- InvoicePaid - Khi hóa đơn được thanh toán
+- NewNotification - Thông báo mới
+
+Hiển thị:
+- Toast popup góc phải
+- Cập nhật badge thông báo
+- Auto-refresh data nếu đang xem page liên quan
+
+
+================================================================================
+END OF DOCUMENT - 32 TABLES FULLY COVERED
+================================================================================
